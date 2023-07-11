@@ -21,4 +21,6 @@ __pycache__/
 *.so
 
 package-lock.json
+dist/
+node_modules
 .env
