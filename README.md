@@ -20,7 +20,7 @@
   npm install --save-dev typescript @types/node
   npm install @apollo/server graphql
   ```
-5. Start ApolloServer
+5. Start Service
   ```console
   npm start
   ```
