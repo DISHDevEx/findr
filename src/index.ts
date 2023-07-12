@@ -1,22 +1,24 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { addMocksToSchema } from "@graphql-tools/mock";
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { typeDefs } from "./schemas/mock.js";
-import { mocks } from "./resolvers/mock.js";
+import { spacexSchema } from "./schemas/spacex.js";
+import { spacexResolver } from "./resolvers/spacex.js";
+import { SpacexAPI } from "./datasources/spacex-api.js";
 
 async function startApolloServer() {
-  const server = new ApolloServer({
-    schema: addMocksToSchema({
-      schema: makeExecutableSchema({ typeDefs }),
-      mocks
-    }),
+  const server = new ApolloServer({ spacexSchema, spacexResolver })
+  const { url } = await startStandaloneServer(server, {
+    context: async () => {
+      const { cache } = server;
+      return {
+        dataSources: {
+          spacexAPI: new SpacexAPI({ cache })
+        }
+      }
+    }
   });
-  const { url } = await startStandaloneServer(server);
   console.log(`
-    🚀  Server is running!
-    📭  Query at ${url}
-  `);
+      🚀  Server is running
+      📭  Query at ${url}
+    `);
 }
-
 startApolloServer();
