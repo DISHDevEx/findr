@@ -4,6 +4,7 @@
 1. Clone the repo
   ```console
   git clone git@github.com:DISHDevEx/findr.git
+  cd findr
   ```
 2. Install Node
   ```console
@@ -15,7 +16,7 @@
   ```console
   npm config set strict-ssl false
   ```
-4. Install Dependecies
+4. Install Dependencies
   ```console
   npm install --save-dev typescript @types/node
   npm install @apollo/server graphql
