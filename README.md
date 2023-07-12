@@ -16,12 +16,7 @@
   ```console
   npm config set strict-ssl false
   ```
-4. Install Dependencies
-  ```console
-  npm install --save-dev typescript @types/node
-  npm install @apollo/server graphql
-  ```
-5. Start Service
+4. Start Service
   ```console
   npm install && npm start
   ```
