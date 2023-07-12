@@ -23,5 +23,5 @@
   ```
 5. Start Service
   ```console
-  npm start
+  npm install && npm start
   ```
