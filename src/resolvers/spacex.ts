@@ -1,13 +1,12 @@
-
-export const spacexResolver = {
+export const resolvers = {
   Query: {
-    Missions: (_,_, { dataSources }) => {
+    spacexMissions: (_,__, { dataSources }) => {
       return dataSources.spacexAPI.getMissions();
     },
   },
-  Mission:{
-    payload: ({ payload_id }, _, { dataSources }) => {
-      return dataSources.spacexAPI.getpayload(payload_id);
-    }
-  }
+  Missions: {
+      payload : ( { payload_id }, _, { dataSources }) => {
+        return dataSources.spacexAPI.getPayload(payload_id);
+      },
+    },
 };

@@ -1,11 +1,11 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { spacexSchema } from "./schemas/spacex.js";
-import { spacexResolver } from "./resolvers/spacex.js";
+import { typeDefs } from "./schemas/spacex.js";
+import { resolvers } from "./resolvers/spacex.js";
 import { SpacexAPI } from "./datasources/spacex-api.js";
 
 async function startApolloServer() {
-  const server = new ApolloServer({ spacexSchema, spacexResolver })
+  const server = new ApolloServer({ typeDefs, resolvers })
   const { url } = await startStandaloneServer(server, {
     context: async () => {
       const { cache } = server;
@@ -17,8 +17,9 @@ async function startApolloServer() {
     }
   });
   console.log(`
-      🚀  Server is running
-      📭  Query at ${url}
-    `);
+    🚀  Server is running!
+    📭  Query at ${url}
+  `);
 }
-startApolloServer();
+
+startApolloServer()
