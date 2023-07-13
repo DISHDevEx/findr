@@ -6,7 +6,7 @@ export const spacexResolver = {
     },
   },
   Mission:{
-    payload: ({ paylaod_id }, _, { dataSources }) => {
+    payload: ({ payload_id }, _, { dataSources }) => {
       return dataSources.spacexAPI.getpayload(payload_id);
     }
   }
