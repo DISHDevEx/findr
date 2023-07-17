@@ -7,7 +7,7 @@ import { SpacexAPI } from "./datasources/spacex-api.js";
 
 async function startApolloServer() {
   const server = new ApolloServer({ typeDefs, resolvers,
-    //plugins: [ApolloServerPluginInlineTrace()], 
+    //plugins: [ApolloServerPluginInlineTrace()],
   })
   const { url } = await startStandaloneServer(server, {
     context: async () => {
