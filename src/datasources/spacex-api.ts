@@ -1,14 +1,22 @@
-import { RESTDataSource } from "@apollo/datasource-rest";
+import fs from 'fs';
+import https from 'https';
+import { RESTDataSource } from 'apollo-datasource-rest';
 
- export class SpacexAPI extends RESTDataSource {
+const certificateFilePath = 'openssl/spacex.pem'; // Replace with the actual path to your certificate file
 
-  baseURL = "https://api.spacexdata.com/v4/";
-
-  getCapsules() {
-    return this.get("capsules");
+export class SpaceXAPI extends RESTDataSource {
+  constructor() {
+    super();
+    this.baseURL = 'https://api.spacexdata.com/v4/';
   }
 
-  //getPayload(payloadId) {
-  //  return  this.get(`payloads/${payloadId}`);
-  //}
+  willSendRequest(request: any) {
+    request.headers.set('User-Agent', 'Apollo GraphQL Server'); // Add a custom User-Agent header if needed
+    //request.agent = new https.Agent({ ca: fs.readFileSync(certificateFilePath) }); // Set the custom agent
+    request.agent = new https.Agent({ rejectUnauthorized: false }); //
+  }
+
+  async getCapsules() {
+    return this.get('capsules');
+  }
 }

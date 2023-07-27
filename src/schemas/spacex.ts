@@ -1,11 +1,7 @@
 import gql from "graphql-tag";
 
 export const typeDefs = gql`
-  type Query {
-    spacexCapsules: [Capsules!]!
-  }
-
-  type Capsules {
+  type Capsule {
     reuse_count: Int
     water_landings: Int
     land_landings: Int
@@ -17,4 +13,7 @@ export const typeDefs = gql`
     id: ID!
   }
 
+  type Query {
+    spacexCapsules: [Capsule]
+  }
 `;

@@ -1,28 +1,27 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-//import { ApolloServerPluginInlineTrace } from "apollo-server-core";
+import express from 'express';
+import { ApolloServer, gql } from 'apollo-server-express';
 import { typeDefs } from "./schemas/spacex.js";
 import { resolvers } from "./resolvers/spacex.js";
-import { SpacexAPI } from "./datasources/spacex-api.js";
+import { SpaceXAPI } from "./datasources/spacex-api.js";
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  dataSources: () => ({
+    spaceXAPI: new SpaceXAPI(),
+  }),
+});
 
 async function startApolloServer() {
-  const server = new ApolloServer({ typeDefs, resolvers,
-    //plugins: [ApolloServerPluginInlineTrace()],
-  })
-  const { url } = await startStandaloneServer(server, {
-    context: async () => {
-      const { cache } = server;
-      return {
-        dataSources: {
-          spacexAPI: new SpacexAPI({ cache })
-        }
-      }
-    }
-  });
-  console.log(`
-    🚀  Server is running!
-    📭  Query at ${url}
-  `);
+  await server.start();
+
+  const app = express();
+  server.applyMiddleware({ app });
+
+  const PORT = 4000;
+  app.listen({ port: PORT }, () =>
+    console.log(`Apollo Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+  );
 }
 
-startApolloServer()
+startApolloServer().catch((err) => console.error('Error starting Apollo server:', err));
