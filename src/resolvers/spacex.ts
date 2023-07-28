@@ -3,5 +3,9 @@ export const resolvers = {
     spacexCapsules: async (_source: any, _args: any, { dataSources }: any) => {
       return dataSources.spaceXAPI.getCapsules();
     },
+
+    spacexLaunches: async (_source: any, _args: any, { dataSources }: any) => {
+      return dataSources.spaceXAPI.getLaunches();
+    },
   },
 };

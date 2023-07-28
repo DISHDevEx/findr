@@ -25,4 +25,8 @@ export class SpaceXAPI extends RESTDataSource {
   async getCapsules() {
     return this.get('capsules');
   }
+
+  async getLaunches() {
+    return this.get('launches');
+  }
 }
