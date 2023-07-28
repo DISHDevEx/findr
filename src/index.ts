@@ -5,10 +5,18 @@ import { ApolloServer, gql } from 'apollo-server-express';
 import { typeDefs } from "./schemas/spacex.js";
 import { resolvers } from "./resolvers/spacex.js";
 import { SpaceXAPI } from "./datasources/spacex-api.js";
+import path from 'path';
+import dotenv from 'dotenv';
 
-// Import the self-signed certificate files
-const privateKey = fs.readFileSync('openssl/key.pem', 'utf8');
-const certificate = fs.readFileSync('openssl/cert.pem', 'utf8');
+dotenv.config();
+
+// Resolve the absolute paths to the certificate files
+const privateKeyPath = path.resolve(process.env.CERTIFICATE_DIR, process.env.LOCAL_KEY_FILE);
+const certificatePath = path.resolve(process.env.CERTIFICATE_DIR, process.env.LOCAL_CERT_FILE);
+
+// Read the certificate files with the correct encoding
+const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+const certificate = fs.readFileSync(certificatePath, 'utf8');
 
 const server = new ApolloServer({
   typeDefs,
