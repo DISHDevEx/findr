@@ -67,7 +67,7 @@ export const typeDefs = gql`
   }
   
   type Payload {
-    id: String!
+    id: String
   }
   
   type Launch {
