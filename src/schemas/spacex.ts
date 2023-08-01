@@ -83,7 +83,7 @@ export const typeDefs = gql`
     details: String
     crew: [String!]!
     ships: [String!]!
-    capsules: [String!]!
+    capsules: [Capsule!]!
     payloads: [Payload!]!
     launchpad: String!
     flight_number: Int!
