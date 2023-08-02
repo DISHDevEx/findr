@@ -1,4 +1,4 @@
-import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway';
+import { ApolloGateway, RemoteGraphQLDataSource, IntrospectAndCompose } from '@apollo/gateway';
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   // If you have custom headers to add for authentication, you can override this method
@@ -8,12 +8,12 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
 }
 
 const gateway = new ApolloGateway({
-  serviceList: [
-    // Add the URLs for all your federated services here
-    { name: 'spaceX', url: 'http://localhost:4001/graphql' },
-    // Add more services as needed
-  ],
-  buildService: ({ url }) => new AuthenticatedDataSource({ url }),
+  supergraphSdl: new IntrospectAndCompose({
+    subgraphs: [
+      { name: 'sapceX', url: 'http://localhost:4001/graphql' },
+      // ...additional subgraphs...
+    ],
+  }),
 });
 
 const { schema, executor } = await gateway.load();
