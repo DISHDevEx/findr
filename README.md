@@ -18,5 +18,8 @@
   ```
 4. Start Service
   ```console
-  npm install && npm start
+  npm install
+  npm run compile
+  node dist/spacex/spacex.js
+  node dist/gateway.js
   ```
