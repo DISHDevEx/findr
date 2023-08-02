@@ -21,8 +21,8 @@ export class SpaceXAPI extends RESTDataSource {
 
   willSendRequest(request: any) {
     request.headers.set('User-Agent', 'Apollo GraphQL Server'); // Add a custom User-Agent header if needed
-    //request.agent = new https.Agent({ ca: spacexCert }); // Set the custom agent
-    request.agent = new https.Agent({ rejectUnauthorized: false }); //SSL disabled
+    request.agent = new https.Agent({ ca: spacexCert }); // Set the custom agent
+    //request.agent = new https.Agent({ rejectUnauthorized: false }); //SSL disabled
   }
 
   async getCapsules() {

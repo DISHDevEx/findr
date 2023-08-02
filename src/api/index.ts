@@ -36,7 +36,7 @@ async function startApolloServer() {
 
   server.applyMiddleware({ app });
 
-  const PORT = 3000;
+  const PORT = 4001;
   httpsServer.listen(PORT, () => {
     console.log(`Apollo Server ready at https://localhost:${PORT}${server.graphqlPath}`);
   });
