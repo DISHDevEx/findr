@@ -1,29 +1,19 @@
-import { ApolloGateway, RemoteGraphQLDataSource, IntrospectAndCompose } from '@apollo/gateway';
+import { ApolloGateway } from '@apollo/gateway';
 import { ApolloServer, gql } from 'apollo-server-express';
 import express from 'express';
 
-// class AuthenticatedDataSource extends RemoteGraphQLDataSource {
-//   // If you have custom headers to add for authentication, you can override this method
-//   willSendRequest({ request, context }) {
-//     // Add headers or authentication tokens here based on the request or context
-//   }
-// }
 
 const gateway = new ApolloGateway({
-  supergraphSdl: new IntrospectAndCompose({
-    subgraphs: [
-      { name: 'spacex', url: 'http://localhost:4001/graphql' },
-      // ...additional subgraphs...
-    ],
-  }),
+  serviceList: [
+    { name: "spacex", url: "http://localhost:4001/graphql" }
+  ]
 });
 
-const { schema, executor } = await gateway.load();
+//const { schema, executor } = await gateway.load();
 
 // Create ApolloServer with the loaded schema and executor
 const server = new ApolloServer({
-  schema,
-  executor,
+  gateway
 });
 
 async function startApolloGateway() {

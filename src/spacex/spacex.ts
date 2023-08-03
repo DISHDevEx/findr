@@ -5,6 +5,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { ApolloServer, gql } from 'apollo-server-express';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefs } from "./schemas/spacex.js";
 import { resolvers } from "./resolvers/spacex.js";
 import { SpaceXAPI } from "./datasources/spacex-api.js";
@@ -21,10 +22,12 @@ dotenv.config();
 // const certificate = fs.readFileSync(certificatePath, 'utf8');
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  dataSources: () => ({
-    spaceXAPI: new SpaceXAPI(),
+  schema: buildSubgraphSchema({
+    typeDefs,
+    resolvers,
+    dataSources: () => ({
+      spaceXAPI: new SpaceXAPI(),
+    }),
   }),
 });
 
