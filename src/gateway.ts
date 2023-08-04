@@ -9,8 +9,6 @@ const gateway = new ApolloGateway({
   ]
 });
 
-//const { schema, executor } = await gateway.load();
-
 // Create ApolloServer with the loaded schema and executor
 const server = new ApolloServer({
   gateway
@@ -24,7 +22,7 @@ async function startApolloGateway() {
 
   const PORT = 4000;
   app.listen({ port: PORT }, () =>
-    console.log(`Apollo Gateway ready at http://localhost:${PORT}${server.graphqlPath}`)
+    console.log(`Apollo Gateway ready at http://localhost:${PORT}/gateway`)
   );
 }
 

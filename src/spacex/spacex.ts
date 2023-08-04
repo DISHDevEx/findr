@@ -41,7 +41,7 @@ async function startApolloServer() {
 
   const PORT = 4001;
   app.listen({ port: PORT }, () =>
-    console.log(`Apollo Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+    console.log(`Apollo Server ready at http://localhost:${PORT}/spacex`)
   );
 }
 
