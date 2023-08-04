@@ -22,7 +22,7 @@ async function startApolloGateway() {
 
   const PORT = 4000;
   app.listen({ port: PORT }, () =>
-    console.log(`Apollo Gateway ready at http://localhost:${PORT}/gateway`)
+    console.log(`Apollo Gateway ready at http://localhost:${PORT}${server.graphqlPath}`)
   );
 }
 
