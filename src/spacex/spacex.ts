@@ -25,9 +25,9 @@ const server = new ApolloServer({
   schema: buildSubgraphSchema({
     typeDefs,
     resolvers,
-    dataSources: () => ({
-      spaceXAPI: new SpaceXAPI(),
-    }),
+  }),
+  dataSources: () => ({
+    spaceXAPI: new SpaceXAPI(),
   }),
 });
 
