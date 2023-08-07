@@ -1,18 +1,7 @@
 import gql from "graphql-tag";
 
 export const typeDefs = gql`
-  type Capsule {
-    reuse_count: Int
-    water_landings: Int
-    land_landings: Int
-    last_update: String
-    launches: [String]
-    serial: String
-    status: String
-    type: String
-    id: ID!
-  }
-
+  
   type Fairings {
     reused: Boolean!
     recovery_attempt: Boolean!
@@ -69,7 +58,123 @@ export const typeDefs = gql`
   type Payload {
     id: String
   }
+
+  type Height {
+    meters: Float
+    feet: Float
+  }
   
+  type Diameter {
+    meters: Float
+    feet: Float
+  }
+  
+  type Thrust {
+    kN: Float
+    lbf: Float
+  }
+  
+  type Mass {
+    kg: Int
+    lb: Int
+  }
+  
+  type FirstStage {
+    thrust_sea_level: Thrust
+    thrust_vacuum: Thrust
+    reusable: Boolean
+    engines: Int
+    fuel_amount_tons: Float
+    burn_time_sec: Int
+  }
+  
+  type CompositeFairing {
+    height: Height
+    diameter: Diameter
+  }
+  
+  type Payloads {
+    composite_fairing: CompositeFairing
+    option_1: String
+  }
+  
+  type Engines {
+    isp: Isp
+    thrust_sea_level: Thrust
+    thrust_vacuum: Thrust
+    number: Int
+    type: String
+    version: String
+    layout: String
+    engine_loss_max: Int
+    propellant_1: String
+    propellant_2: String
+    thrust_to_weight: Int
+  }
+  
+  type Isp {
+    sea_level: Int
+    vacuum: Int
+  }
+  
+  type LandingLegs {
+    number: Int
+    material: String
+  }
+  
+  type PayloadWeight {
+    id: String
+    name: String
+    kg: Int
+    lb: Int
+  }
+  
+  type SecondStage {
+    thrust: Thrust
+    payloads: Payloads
+    reusable: Boolean
+    engines: Int
+    fuel_amount_tons: Float
+    burn_time_sec: Int
+  }
+
+  type Capsule {
+    reuse_count: Int
+    water_landings: Int
+    land_landings: Int
+    last_update: String
+    launches: [String]
+    serial: String
+    status: String
+    type: String
+    id: ID!
+  }
+
+  type Rocket {
+    height: Height
+    diameter: Diameter
+    mass: Mass
+    first_stage: FirstStage
+    second_stage: SecondStage
+    engines: Engines
+    landing_legs: LandingLegs
+    payload_weights: [PayloadWeight]
+    flickr_images: [String]
+    name: String
+    type: String
+    active: Boolean
+    stages: Int
+    boosters: Int
+    cost_per_launch: Int
+    success_rate_pct: Int
+    first_flight: String
+    country: String
+    company: String
+    wikipedia: String
+    description: String
+    id: ID
+  }
+
   type Launch {
     fairings: Fairings!
     links: Links!
@@ -77,8 +182,8 @@ export const typeDefs = gql`
     static_fire_date_unix: Int
     net: Boolean!
     window: Int!
-    rocket: String!
-    success: Boolean!
+    rocket: [Rocket!]!
+    success: Boolean
     failures: [Failure!]!
     details: String
     crew: [String!]!
@@ -103,5 +208,7 @@ export const typeDefs = gql`
   type Query {
     spacexCapsules: [Capsule]
     spacexLaunches: [Launch]
+    spacexRockets: [Rocket]
   }
+  
 `;

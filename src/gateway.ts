@@ -1,12 +1,13 @@
-import { ApolloGateway } from '@apollo/gateway';
+import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloServer, gql } from 'apollo-server-express';
 import express from 'express';
 
-
 const gateway = new ApolloGateway({
-  serviceList: [
-    { name: "spacex", url: "http://localhost:4001/graphql" }
-  ]
+  supergraphSdl: new IntrospectAndCompose({
+    subgraphs: [
+      { name: "spacex", url: "http://localhost:4001/graphql" }
+    ]
+  })
 });
 
 // Create ApolloServer with the loaded schema and executor

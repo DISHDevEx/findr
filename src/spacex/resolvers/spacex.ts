@@ -1,27 +1,64 @@
 export const resolvers = {
+  Launch: {
+    rocket: async (launch: any, _args: any, { dataSources }: any) => {
+      try {
+        const rocketId = launch.rocket;
+        const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
+        return rocket;
+      } catch (error) {
+        // Handle the "404: Not Found" error by returning null or an appropriate response
+        console.error("Error fetching rocket:", error.message);
+        return null;
+      }
+    },
+  },
+
   Query: {
     spacexCapsules: async (_source: any, _args: any, { dataSources }: any) => {
       return dataSources.spaceXAPI.getCapsules();
     },
 
+    spacexRockets: async (_source: any, _args: any, { dataSources }: any) => {
+      try {
+        const rockets = await dataSources.spaceXAPI.getRockets();
+        return rockets;
+      } catch (error) {
+        // Handle the "404: Not Found" error by returning an empty array or an appropriate response
+        console.error("Error fetching rockets:", error.message);
+        return [];
+      }
+    },
+
     spacexLaunches: async (_source: any, _args: any, { dataSources }: any) => {
-      // Fetch all launches from the SpaceX API
-      const launches = await dataSources.spaceXAPI.getLaunches();
+      try {
+        const launches = await dataSources.spaceXAPI.getLaunches();
 
-      // Fetch capsules for each launch and add them to the 'capsules' field of the launch object
-      const launchesWithCapsules = await Promise.all(
-        launches.map(async (launch: any) => {
-          const capsules = await Promise.all(
-            launch.capsules.map(async (capsuleId: string) => {
-              return dataSources.spaceXAPI.getCapsuleById(capsuleId);
-            })
-          );
+        const launchesWithCapsulesAndRockets = await Promise.all(
+          launches.map(async (launch: any) => {
+            const capsules = await Promise.all(
+              launch.capsules.map(async (capsuleId: string) => {
+                return dataSources.spaceXAPI.getCapsuleById(capsuleId);
+              })
+            );
 
-          return { ...launch, capsules };
-        })
-      );
+            try {
+              const rocketId = launch.rocket;
+              const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
 
-      return launchesWithCapsules;
+              return { ...launch, capsules, rocket };
+            } catch (error) {
+              console.error("Error fetching rocket for launch:", error.message);
+              return { ...launch, capsules };
+            }
+          })
+        );
+
+        return launchesWithCapsulesAndRockets;
+      } catch (error) {
+        // Handle other errors that may occur during launch data retrieval
+        console.error("Error fetching launches:", error.message);
+        return [];
+      }
     },
   },
 };

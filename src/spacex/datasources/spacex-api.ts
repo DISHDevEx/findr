@@ -33,7 +33,15 @@ export class SpaceXAPI extends RESTDataSource {
     return this.get('launches');
   }
 
+  async getRockets() {
+    return this.get('rockets');
+  }
+
   async getCapsuleById(capsuleId: string) {
     return this.get(`capsules/${capsuleId}`);
+  }
+
+  async getRocketById(rocketID: string) {
+    return this.get(`rockets/${rocketID}`);
   }
 }
