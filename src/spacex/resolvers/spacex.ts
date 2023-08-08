@@ -3,7 +3,9 @@ export const resolvers = {
     rocket: async (launch: any, _args: any, { dataSources }: any) => {
       try {
         const rocketId = launch.rocket;
+        //console.log("Fetching rocket with ID:", rocketId);
         const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
+        //console.log("Fetched rocket:", rocket);
         return rocket;
       } catch (error) {
         // Handle the "404: Not Found" error by returning null or an appropriate response
@@ -43,7 +45,11 @@ export const resolvers = {
 
             try {
               const rocketId = launch.rocket;
-              const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
+              const rocket = await Promise.all(
+                launch.rocket.map(async (rocketId: string) => {
+                  return dataSources.spaceXAPI.getRocketById(rocketId);
+                })
+              );
 
               return { ...launch, capsules, rocket };
             } catch (error) {
