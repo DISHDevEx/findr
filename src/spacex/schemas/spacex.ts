@@ -182,7 +182,7 @@ export const typeDefs = gql`
     static_fire_date_unix: Int
     net: Boolean!
     window: Int!
-    rocket: Rocket!
+    rocket: Rocket
     success: Boolean
     failures: [Failure!]!
     details: String

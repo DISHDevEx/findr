@@ -2,7 +2,7 @@ export const resolvers = {
   Launch: {
     rocket: async (launch: any, _args: any, { dataSources }: any) => {
       try {
-        const rocketId = launch.rocket;
+        const rocketId = launch.rocket.id;
         //console.log("Fetching rocket with ID:", rocketId);
         const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
         //console.log("Fetched rocket:", rocket);
@@ -45,11 +45,7 @@ export const resolvers = {
 
             try {
               const rocketId = launch.rocket;
-              const rocket = await Promise.all(
-                launch.rocket.map(async (rocketId: string) => {
-                  return dataSources.spaceXAPI.getRocketById(rocketId);
-                })
-              );
+              const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
 
               return { ...launch, capsules, rocket };
             } catch (error) {
