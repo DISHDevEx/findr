@@ -55,14 +55,17 @@
 
 ## __Using Postman__
 1. Launch the Postman application
+
 2. Set Request Details
     1. Choose the request method as POST
     2. Enter http://localhost:4000/graphql URL in the request URL field
+
 3. Add a Content-Type header to specify that you're sending a GraphQL request as JSON.
     1. Click on the "Headers" tab
     2. Click "Add Row"
     3. Enter Content-Type in the "Key" field
     4. Enter application/json in the "Value" field
+
 4. Add Graphql Query in the "Body" section
     1. Select the "raw" option.
     2. Choose "JSON" as the data format.
