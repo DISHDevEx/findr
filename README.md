@@ -1,5 +1,11 @@
 # FINDR - Federated IOT Network Device Registry
 
+## __Prerequistes__
+Install homebrew 
+  Follow the instructions from https://brew.sh/
+
+Restart the terminal and follow below instructions
+
 ## __Local Setup__
 1. Clone the repo
   ```console
