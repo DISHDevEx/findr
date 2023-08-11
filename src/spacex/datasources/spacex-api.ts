@@ -7,10 +7,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Read the certificate files with the correct encoding
-const spacexCertFilePath = path.resolve(process.env.CERTIFICATE_DIR, process.env.SPACEX_CERT_FILE);
-console.log('cert path' + spacexCertFilePath)
+//const spacexCertFilePath = path.resolve(process.env.CERTIFICATE_DIR, process.env.SPACEX_CERT_FILE);
+// console.log('cert path' + spacexCertFilePath)
 
-const spacexCert = fs.readFileSync(spacexCertFilePath, 'utf8');
+// const spacexCert = fs.readFileSync(spacexCertFilePath, 'utf8');
 //console.log('cert' + spacexCert)
 
 export class SpaceXAPI extends RESTDataSource {
