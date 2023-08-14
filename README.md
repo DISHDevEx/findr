@@ -1,5 +1,16 @@
 # FINDR - Federated IOT Network Device Registry
 
+Unified endpoint to Observe Interact and Onboard IOT devices over wide range of network and data transfer protocols
+
+## __QuickStart__
+
+To learn how 
+
+Apollo Graphql works - https://www.apollographql.com/docs/
+
+Apollo Federation works - https://www.apollographql.com/docs/federation
+
+
 ## __Prerequisites__
 Install Homebrew 
     
