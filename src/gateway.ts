@@ -32,7 +32,7 @@ async function startApolloGateway() {
 
   const PORT = 4000;
   app.listen({ port: PORT }, () =>
-    console.log(`Apollo Gateway and Voyager ready at http://localhost:${PORT}`)
+    console.log(`Apollo Gateway ready at http://localhost:${PORT}`)
   );
 }
 
