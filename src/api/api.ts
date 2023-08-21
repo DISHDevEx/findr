@@ -6,9 +6,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/subgraph';
-import { typeDefs } from "./schemas/spacex.js";
-import { resolvers } from "./resolvers/spacex.js";
-import { SpaceXAPI } from "./datasources/spacex-api.js";
+import { typeDefs } from "./spacex-api-schema.js";
+import { resolvers } from "./spacex-api-resolver.js";
+import { SpaceXAPI } from "./api-connector.js";
 
 
 dotenv.config();
