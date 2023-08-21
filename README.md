@@ -1,6 +1,6 @@
 # FINDR - Federated IOT Network Device Registry
 
-Unified connectivity service to Observe Interact and Onboard industry specific devices over wide range of network and data protocols
+*Simple-to-use unified connectivity service to **Observe**, **Interact**, and **Onboard** industry-specific devices across a wide range of network & data protocols*
 
 ## __QuickStart__
 
