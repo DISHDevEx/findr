@@ -1,6 +1,6 @@
 # FINDR - Federated IOT Network Device Registry
 
-Unified endpoint to Observe Interact and Onboard IOT devices over wide range of network and data transfer protocols
+Unified connectivity service to Observe Interact and Onboard IOT devices over wide range of network and data transfer protocols
 
 ## __QuickStart__
 
@@ -45,7 +45,7 @@ Restart the terminal and follow below instructions
   ```
 6. Start Service
   ```console
-  node dist/spacex/spacex.js
+  node dist/api/api.js
   ```
   Apollo Server ready at http://localhost:4001/graphql
 
