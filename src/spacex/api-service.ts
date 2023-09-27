@@ -1,11 +1,12 @@
-import { SpaceXAPI } from "../connectors/api";
+import { API } from "../connectors/api";
+import dotenv from 'dotenv';
+dotenv.config();
 
+export class SpaceXAPI {
 
-export class SpaceXService {
-
-  public api: SpaceXAPI;
+  private api: API;
   
-  constructor(api: SpaceXAPI) {
+  constructor(api: API) {
     this.api = api;
   }
 

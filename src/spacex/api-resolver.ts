@@ -1,61 +1,69 @@
-// spacex-service.ts
-import { SpaceXService } from "./api-service";
-import { SpaceXAPI } from "../connectors/api";
+import { SpaceXAPI } from "./api-service";
+import { API } from "../connectors/api";
 
-export class SpaceXResolver {
-  private dataSources: SpaceXAPI;
+export const SpaceXResolvers = {
+  Launch: {
+    rocket: async (launch: any, _args: any, { dataSources }: any) => {
+      try {
+        const rocketId = launch.rocket.id;
+        //console.log("Fetching rocket with ID:", rocketId);
+        const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
+        //console.log("Fetched rocket:", rocket);
+        return rocket;
+      } catch (error) {
+        // Handle the "404: Not Found" error by returning null or an appropriate response
+        console.error("Error fetching rocket:", error.message);
+        return null;
+      }
+    },
+  },
 
-  constructor(dataSources: SpaceXAPI) {
-    this.dataSources = dataSources;
-  }
+  Query: {
+    spacexCapsules: async (_source: any, _args: any, { dataSources }: any) => {
+      return dataSources.spaceXAPI.getCapsules();
+    },
 
-  async getRocketById(rocketId: string) {
-    try {
-      const rocket = await this.dataSources.getRocketById(rocketId);
-      return rocket;
-    } catch (error) {
-      console.error("Error fetching rocket:", error.message);
-      return null;
-    }
-  }
+    spacexRockets: async (_source: any, _args: any, { dataSources }: any) => {
+      try {
+        const rockets = await dataSources.spaceXAPI.getRockets();
+        return rockets;
+      } catch (error) {
+        // Handle the "404: Not Found" error by returning an empty array or an appropriate response
+        console.error("Error fetching rockets:", error.message);
+        return [];
+      }
+    },
 
-  async getRockets() {
-    try {
-      const rockets = await this.dataSources.getRockets();
-      return rockets;
-    } catch (error) {
-      console.error("Error fetching rockets:", error.message);
-      return [];
-    }
-  }
+    spacexLaunches: async (_source: any, _args: any, { dataSources }: any) => {
+      try {
+        const launches = await dataSources.spaceXAPI.getLaunches();
 
-  async getLaunchesWithCapsulesAndRockets() {
-    try {
-      const launches = await this.dataSources.getLaunches();
+        const launchesWithCapsulesAndRockets = await Promise.all(
+          launches.map(async (launch: any) => {
+            const capsules = await Promise.all(
+              launch.capsules.map(async (capsuleId: string) => {
+                return dataSources.spaceXAPI.getCapsuleById(capsuleId);
+              })
+            );
 
-      const launchesWithCapsulesAndRockets = await Promise.all(
-        launches.map(async (launch: any) => {
-          const capsules = await Promise.all(
-            launch.capsules.map(async (capsuleId: string) => {
-              return this.dataSources.getCapsuleById(capsuleId);
-            })
-          );
+            try {
+              const rocketId = launch.rocket;
+              const rocket = await dataSources.spaceXAPI.getRocketById(rocketId);
 
-          try {
-            const rocketId = launch.rocket;
-            const rocket = await this.getRocketById(rocketId);
+              return { ...launch, capsules, rocket };
+            } catch (error) {
+              console.error("Error fetching rocket for launch:", error.message);
+              return { ...launch, capsules };
+            }
+          })
+        );
 
-            return { ...launch, capsules, rocket };
-          } catch (error) {
-            console.error("Error fetching rocket for launch:", error.message);
-            return { ...launch, capsules };
-          }
-        })
-      );
-
-      return launchesWithCapsulesAndRockets;
-    } catch (error) {
-      console.error("Error fetching launches:", error.message);
-    }
-  }
-}
+        return launchesWithCapsulesAndRockets;
+      } catch (error) {
+        // Handle other errors that may occur during launch data retrieval
+        console.error("Error fetching launches:", error.message);
+        return [];
+      }
+    },
+  },
+};

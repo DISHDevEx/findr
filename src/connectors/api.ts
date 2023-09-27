@@ -1,12 +1,7 @@
-import fs from 'fs';
 import https from 'https';
 import { RESTDataSource } from 'apollo-datasource-rest';
-import path from 'path';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-export class SpaceXAPI extends RESTDataSource {
+export class API extends RESTDataSource {
   constructor(baseURL: string) {
     super();
     this.baseURL = baseURL;

@@ -1,24 +1,21 @@
-import https from 'https';
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/subgraph';
-import { typeDefs } from "./schema.js";
-import { resolvers } from "./api-resolver.js";
-import { SpaceXAPI } from "../connectors/api";
-dotenv.config();
+import { typeDefs } from "./schema";
+import { SpaceXAPI } from './api-service';
+import { SpaceXResolvers } from "./api-resolver";
 
+dotenv.config();
 
 const server = new ApolloServer({
   schema: buildSubgraphSchema({
     typeDefs,
-    resolvers,
+    resolvers: SpaceXResolvers,
   }),
   dataSources: () => ({
-    spaceXAPI: new SpaceXAPI(),
+    SpaceXAPI:  new SpaceXAPI(),
   }),
 });
 
