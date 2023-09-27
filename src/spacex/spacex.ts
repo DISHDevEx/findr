@@ -6,20 +6,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/subgraph';
-import { typeDefs } from "./spacex-api-schema.js";
-import { resolvers } from "./spacex-api-resolver.js";
-import { SpaceXAPI } from "./api-connector.js";
-
-
+import { typeDefs } from "./schema.js";
+import { resolvers } from "./api-resolver.js";
+import { SpaceXAPI } from "../connectors/api";
 dotenv.config();
 
-// // Resolve the absolute paths to the certificate files
-// const privateKeyPath = path.resolve(process.env.CERTIFICATE_DIR, process.env.LOCAL_KEY_FILE);
-// const certificatePath = path.resolve(process.env.CERTIFICATE_DIR, process.env.LOCAL_CERT_FILE);
-
-// // Read the certificate files with the correct encoding
-// const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
-// const certificate = fs.readFileSync(certificatePath, 'utf8');
 
 const server = new ApolloServer({
   schema: buildSubgraphSchema({
