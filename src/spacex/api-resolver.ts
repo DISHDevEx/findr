@@ -1,5 +1,3 @@
-import { SpaceXAPI } from "./api-service";
-import { API } from "../connectors/api";
 
 export const SpaceXResolvers = {
   Launch: {

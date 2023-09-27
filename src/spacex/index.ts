@@ -3,19 +3,19 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/subgraph';
-import { typeDefs } from "./schema";
-import { SpaceXAPI } from './api-service';
-import { SpaceXResolvers } from "./api-resolver";
+import { typeDefs } from "./spacex-schema.js";
+import { SpaceXAPI } from './api-service.js';
+import { SpaceXResolvers } from "./api-resolver.js";
 
 dotenv.config();
 
 const server = new ApolloServer({
   schema: buildSubgraphSchema({
     typeDefs,
-    resolvers: SpaceXResolvers,
+    resolvers:  SpaceXResolvers as any,
   }),
   dataSources: () => ({
-    SpaceXAPI:  new SpaceXAPI(),
+    spaceXAPI:  new SpaceXAPI(),
   }),
 });
 

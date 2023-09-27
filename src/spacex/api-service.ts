@@ -1,32 +1,33 @@
-import { API } from "../connectors/api";
-import dotenv from 'dotenv';
-dotenv.config();
+import { APIConnector } from '../connectors/api.js';
+import { DataSource } from 'apollo-datasource';
 
-export class SpaceXAPI {
 
-  private api: API;
-  
-  constructor(api: API) {
-    this.api = api;
+export class SpaceXAPI extends DataSource {
+
+  private apiConnector: APIConnector;
+
+  constructor() {
+    super();
+    this.apiConnector = new APIConnector(process.env.SPACEX_URL);
   }
 
   async getCapsules() {
-    return this.api.get(`capsules`);
+    return this.apiConnector.get('capsules');
   }
 
   async getLaunches() {
-    return this.api.get(`launches`);
+    return this.apiConnector.get('launches');
   }
 
   async getRockets() {
-    return this.api.get(`rockets`);
+    return this.apiConnector.get('rockets');
   }
 
   async getCapsuleById(capsuleId: string) {
-    return this.api.get(`capsules/${capsuleId}`);
+    return this.apiConnector.get(`capsules/${capsuleId}`);
   }
 
   async getRocketById(rocketID: string) {
-    return this.api.get(`rockets/${rocketID}`);
+    return this.apiConnector.get(`rockets/${rocketID}`);
   }
 }
