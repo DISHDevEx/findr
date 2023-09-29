@@ -1,33 +1,55 @@
 import { APIConnector } from '../connectors/api.js';
-import { DataSource } from 'apollo-datasource';
 
-
-export class SpaceXAPI extends DataSource {
-
-  private apiConnector: APIConnector;
-
+/**
+ * A class representing the SpaceX API.
+ */
+export class SpaceXAPI extends APIConnector {
+  /**
+   * Creates a new instance of the SpaceXAPI class.
+   */
   constructor() {
-    super();
-    this.apiConnector = new APIConnector(process.env.SPACEX_URL);
+    super(process.env.SPACEX_URL);
   }
 
+  /**
+   * Gets all capsules from the SpaceX API.
+   * @returns A Promise that resolves to the response data.
+   */
   async getCapsules() {
-    return this.apiConnector.get('capsules');
+    return this.get('capsules');
   }
 
+  /**
+   * Gets all launches from the SpaceX API.
+   * @returns A Promise that resolves to the response data.
+   */
   async getLaunches() {
-    return this.apiConnector.get('launches');
+    return this.get('launches');
   }
 
+  /**
+   * Gets all rockets from the SpaceX API.
+   * @returns A Promise that resolves to the response data.
+   */
   async getRockets() {
-    return this.apiConnector.get('rockets');
+    return this.get('rockets');
   }
 
+  /**
+   * Gets a capsule by ID from the SpaceX API.
+   * @param capsuleId The ID of the capsule to get.
+   * @returns A Promise that resolves to the response data.
+   */
   async getCapsuleById(capsuleId: string) {
-    return this.apiConnector.get(`capsules/${capsuleId}`);
+    return this.get(`capsules/${capsuleId}`);
   }
 
+  /**
+   * Gets a rocket by ID from the SpaceX API.
+   * @param rocketID The ID of the rocket to get.
+   * @returns A Promise that resolves to the response data.
+   */
   async getRocketById(rocketID: string) {
-    return this.apiConnector.get(`rockets/${rocketID}`);
+    return this.get(`rockets/${rocketID}`);
   }
 }

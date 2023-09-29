@@ -1,4 +1,16 @@
+/**
+ * This file contains the SpaceXResolvers object which defines the resolvers for the SpaceX API.
+ * The Launch resolver fetches the rocket information for a given launch.
+ * The Query resolver provides functions to fetch capsules, rockets, and launches from the SpaceX API.
+ * @packageDocumentation
+ */
 
+/**
+ * This file contains the SpaceXResolvers object which defines the resolvers for the SpaceX API.
+ * The Launch resolver fetches the rocket information for a given launch.
+ * The Query resolver provides functions to fetch capsules, rockets, and launches from the SpaceX API.
+ * @packageDocumentation
+ */
 export const SpaceXResolvers = {
   Launch: {
     rocket: async (launch: any, _args: any, { dataSources }: any) => {

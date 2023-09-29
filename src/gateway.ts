@@ -18,7 +18,9 @@ const server = new ApolloServer({
   gateway
 });
 
-// Start the Apollo Gateway server
+/**
+ * Starts the Apollo Gateway server
+ */
 async function startApolloGateway() {
   await server.start();
 

@@ -1,3 +1,10 @@
+/**
+ * This file sets up an Apollo Server for the SpaceX API. It imports the necessary dependencies, 
+ * including express, dotenv, cors, ApolloServer, buildSubgraphSchema, typeDefs, SpaceXAPI, and SpaceXResolvers. 
+ * It then creates a new ApolloServer instance with a schema built using buildSubgraphSchema, typeDefs, and SpaceXResolvers.
+ *  It also creates a data source for the spaceXAPI using the SpaceXAPI class. 
+ * Finally, it starts the Apollo Server on port 4001 and logs the server's URL to the console.
+ */
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
