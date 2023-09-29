@@ -1,3 +1,8 @@
+/**
+ * This file defines the Apollo Gateway server that serves as a single entry point to multiple subgraphs.
+ * It creates an Apollo Gateway instance and an Apollo Server instance, and starts the server on port 4000.
+ * The server also adds GraphQL Voyager middleware to visualize the schema.
+ */
 import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
