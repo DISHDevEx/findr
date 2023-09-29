@@ -1,4 +1,4 @@
-import { APIConnector } from '../connectors/api.js';
+import { APIConnector } from '../adapters/api.js';
 
 /**
  * A class representing the SpaceX API.
