@@ -1,3 +1,7 @@
+/**
+ * Defines the GraphQL schema for SpaceX data, including types for rockets, launches, capsules, and more.
+ * This schema can be used to query data from the SpaceX API.
+ */
 import gql from "graphql-tag";
 
 export const typeDefs = gql`
