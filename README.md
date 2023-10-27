@@ -51,7 +51,7 @@ Restart the terminal and follow below instructions
 
 7. Start Gateway
   ```console
-  node dist/spacex/gateway.js
+  node dist/gateway.js
   ```
   Apollo Gateway ready at http://localhost:4000/graphql 🚀
 
