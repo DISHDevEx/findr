@@ -45,13 +45,13 @@ Restart the terminal and follow below instructions
   ```
 6. Start Service
   ```console
-  node dist/api/api.js
+  node dist/spacex/index.js
   ```
   Apollo Server ready at http://localhost:4001/graphql 🚀
 
 7. Start Gateway
   ```console
-  node dist/gateway.js
+  node dist/spacex/gateway.js
   ```
   Apollo Gateway ready at http://localhost:4000/graphql 🚀
 
