@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "npm run compile && node ./dist/index.js"
+    "start": "npm run compile && node ./dist/index.js",
+    "ds-mqtt": "npm run compile && node ./dist/ds-mqtt.js",
+    "us-s3": "npm run compile && node ./dist/us-s3.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +34,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.4.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "@aws-sdk/client-s3": "^3.441.0",
+    "@types/jest": "^29.5.7",
+    "parquetjs": "^0.11.2"
   }
 }
