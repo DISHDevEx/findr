@@ -7,8 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "ds-mqtt": "npm run compile && node ./dist/ds-mqtt.js",
-    "us-s3": "npm run compile && node ./dist/us-s3.js",
+    "adapter": "npm run compile && node ./adapter-iot.js",
     "test": "jest"
   },
   "keywords": [],
