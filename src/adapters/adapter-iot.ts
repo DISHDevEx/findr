@@ -1,5 +1,5 @@
 // Import the required classes
-import { DownstreamMqttClient, MqttProtocol } from './ds-mqtt-class.js';
+import { DownstreamMqttClient, MqttProtocol } from './mqtt-class.js';
 
 import * as dotenv from 'dotenv';
 
@@ -11,14 +11,14 @@ const broker = process.env.BROKER;
 const clientId = process.env.CLIENT_ID;
 const caFilePath = process.env.CA_FILE_PATH;
 const topic = process.env.TOPIC;
-const filePath = process.env.FILE_PATH;
+const localFilePath = process.env.LOCAL_FILE_PATH;
 
 /**
  * Function to initialize and use the MQTT adapter.
  * Subscribes to an MQTT topic.
  */
 function initializeMqttAdapter() {
-  const downstreamMqttClient = new DownstreamMqttClient(broker, clientId, caFilePath, protocol as MqttProtocol, topic, filePath);
+  const downstreamMqttClient = new DownstreamMqttClient(broker, clientId, caFilePath, protocol as MqttProtocol, topic, localFilePath);
 
   downstreamMqttClient.start();
 }
