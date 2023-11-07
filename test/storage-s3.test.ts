@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import { S3Uploader } from '../src/upstream-s3';
+import { S3Uploader } from '../src/adapters/storage-s3';
 import { createReadStream } from 'fs';
 
 // Load environment variables from .env files in the test-env folder
-dotenv.config({ path: 'test-env/upstream-s3-test-ts.env' });
+dotenv.config({ path: 'test-env/storage-s3-test.env' });
 
 describe('S3Uploader', () => {
   const bucketName = process.env.BUCKET_NAME ?? '';

@@ -1,5 +1,5 @@
 // Import necessary modules and classes
-import { S3Uploader } from './us-s3-class';
+import { S3Uploader } from './storage-s3';
 import fs from 'fs';
 
 /**
