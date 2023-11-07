@@ -5,9 +5,9 @@ import { Readable } from 'stream';
  * S3Uploader is a class for uploading objects to an Amazon S3 bucket.
  */
 export class S3Uploader {
-  private s3: S3Client;
-  private bucketName: string;
-  private fileKey: string;
+  private readonly s3: S3Client;
+  private readonly bucketName: string;
+  private readonly fileKey: string;
 
   /**
    * Constructs an S3Uploader instance.
@@ -17,8 +17,25 @@ export class S3Uploader {
    * @param {string} region - The AWS region where the S3 bucket is located.
    */
   constructor(bucketName: string, fileKey: string, region: string) {
+    /**
+     * Amazon S3 client instance.
+     * @type {S3Client}
+     * @private
+     */
     this.s3 = new S3Client({ region });
+
+    /**
+     * Name of the Amazon S3 bucket.
+     * @type {string}
+     * @private
+     */
     this.bucketName = bucketName;
+
+    /**
+     * Key to identify the uploaded object within the bucket.
+     * @type {string}
+     * @private
+     */
     this.fileKey = fileKey;
   }
 
@@ -29,6 +46,11 @@ export class S3Uploader {
    * @returns {Promise<void>} A Promise that resolves when the upload is successful, or rejects on error.
    */
   async uploadObject(data: Buffer | Readable): Promise<void> {
+    /**
+     * Parameters for the S3 PutObject command.
+     * @type {Object}
+     * @private
+     */
     const params = {
       Bucket: this.bucketName,
       Key: this.fileKey,
