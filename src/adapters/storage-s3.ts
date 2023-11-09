@@ -61,9 +61,9 @@ export class S3Uploader {
 
     try {
       await this.s3.send(command);
-      console.log(`Object uploaded to S3: s3://${this.bucketName}/${this.fileKey}`);
+      // console.log(`Object uploaded to S3: s3://${this.bucketName}/${this.fileKey}`);
     } catch (error) {
-      console.error(`Error uploading object to S3: ${error.message}`);
+      // console.error(`Error uploading object to S3: ${error.message}`);
       throw error;
     }
   }
