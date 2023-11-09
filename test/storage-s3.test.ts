@@ -1,47 +1,59 @@
+/**
+ * S3Uploader Test
+ *
+ * This test suite validates the behavior of the S3Uploader class when uploading objects to Amazon S3.
+ */
+
 import dotenv from 'dotenv';
-import { S3Uploader } from '../src/adapters/storage-s3';
-import { createReadStream } from 'fs';
+import { S3Uploader } from '../src/storage-s3';
+import { createReadStream, ReadStream } from 'fs';
 
 // Load environment variables from .env files in the test-env folder
 dotenv.config({ path: 'test-env/storage-s3-test.env' });
 
+/**
+ * Retrieve and validate environment variables for Amazon S3 configuration.
+ * Ensure that all required variables are defined to run the tests.
+ */
+const bucketName: string = process.env.BUCKET_NAME ?? '';
+const fileKey: string = process.env.FILE_KEY ?? '';
+const region: string = process.env.REGION ?? '';
+const testFilePath: string = process.env.TEST_FILE_PATH ?? '';
+
+if (!bucketName || !fileKey || !region || !testFilePath) {
+  throw new Error('Missing required environment variables.');
+}
+
 describe('S3Uploader', () => {
-  const bucketName = process.env.BUCKET_NAME ?? '';
-  const fileKey = process.env.FILE_KEY ?? '';
-  const region = process.env.REGION ?? '';
-
-  // Use nullish coalescing operator (??) to provide a default value
-  const testFilePath = process.env.TEST_FILE_PATH ?? '';
-
-  // Adding explicit empty string check
-  if (!bucketName || !fileKey || !region || !testFilePath) {
-    throw new Error('Missing required environment variables.');
-  }
-
-  it('should upload us-s3.txt to Amazon S3', async () => {
-    // Use the nullish coalescing operator (??) for testFilePath
-    const testFilePath = process.env.TEST_FILE_PATH ?? '';
-
-    // Check the type and length of testFilePath
+  /**
+   * Uploads the specified test file to Amazon S3 using the S3Uploader class.
+   * The testFilePath environment variable must be defined and point to a valid file.
+   * Validates the correct behavior of the S3Uploader when uploading a file.
+   */
+  it('should upload the test file to Amazon S3', async () => {
+    // Ensure testFilePath is a non-empty string
     if (typeof testFilePath !== 'string' || testFilePath.length === 0) {
       throw new Error('Test file path is not a valid string or is empty.');
     }
 
-    const s3Uploader = new S3Uploader(bucketName, fileKey, region);
+    // Create an S3Uploader instance with Amazon S3 configuration
+    const s3Uploader: S3Uploader = new S3Uploader(bucketName, fileKey, region);
 
-    // Check if s3Uploader is null
+    // Ensure that s3Uploader is not null
     if (s3Uploader === null) {
       throw new Error('Failed to create an S3Uploader instance.');
     }
 
-    // Check if fileStream is null or undefined
-    const fileStream = createReadStream(testFilePath);
+    // Create a read stream for the test file
+    const fileStream: ReadStream = createReadStream(testFilePath);
 
+    // Throw an error if fileStream is falsy (null or undefined)
     if (fileStream === null || fileStream === undefined) {
       throw new Error('Failed to create a read stream for the test file.');
     }
 
     try {
+      // Upload the test file to Amazon S3
       await s3Uploader.uploadObject(fileStream);
     } catch (error) {
       // Handle any errors
