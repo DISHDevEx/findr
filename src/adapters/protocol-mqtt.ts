@@ -142,11 +142,7 @@ class MqttAdapter {
   }
 
   public startClient(): void {
-    if (this.client !== null && this.client !== undefined) {
-      this.connectClient();
-    } else {
-      console.error('MQTT client is already connected.');
-    }
+    this.connectClient();
   }
 
   /**
