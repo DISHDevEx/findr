@@ -44,8 +44,8 @@ if (SOURCE === 'mqtts') {
   };
 
   // Create an instance of MqttAdapter
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
+  mqttAdapter.startClient()
 } else {
   console.error('Invalid source. Expected "mqtts".');
 }

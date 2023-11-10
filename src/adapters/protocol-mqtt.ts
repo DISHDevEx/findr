@@ -121,25 +121,32 @@ class MqttAdapter {
     this.topic = config.topic;
     this.messageSaver = new LocalMessageSaver(this.messageFilePath);
     this.dataTransferHandler = new DataTransferHandler(this.source, this.destination);
+  }
 
-    // Connect to MQTT broker
+  private connectClient(): void {
     const options: IClientOptions = {
       clientId: this.clientId,
-      protocol: this.protocol,
       ca: [readFileSync(this.caFilePath)],
       rejectUnauthorized: false,
     };
 
     this.client = connect(this.mqttBroker, options);
 
-    // Set up event handlers
     this.client.on('connect', () => {
       console.log('Connected to MQTT broker');
       this.subscribeToTopic(this.topic);
-      this.client.on('message', async (receivedTopic, message) => {
+      this.client!.on('message', async (receivedTopic, message) => {
         await this.handleMessage(receivedTopic, message);
       });
     });
+  }
+
+  public startClient(): void {
+    if (this.client !== null && this.client !== undefined) {
+      this.connectClient();
+    } else {
+      console.error('MQTT client is already connected.');
+    }
   }
 
   /**
@@ -149,7 +156,9 @@ class MqttAdapter {
   private subscribeToTopic(topic: string): void {
     this.client.subscribe(topic, (err) => {
       if (err === null) {
-        console.log(`Subscribed to ${topic} topic`);
+        console.log(`Subscriber subscribed to ${this.topic} topic`);
+      } else {
+        console.error(`Error subscribing to ${this.topic} topic: ${err}`);
       }
     });
   }
@@ -159,7 +168,7 @@ class MqttAdapter {
    * @param topic - The topic on which the message was received.
    * @param message - The received message as a Buffer.
    */
-  private handleMessage(topic: string, message: Buffer): void {
+  public handleMessage(topic: string, message: Buffer): void {
     console.log(`Received message on topic ${topic}: ${message.toString('utf-8')}`);
 
     const yearMonthDate = extractYearMonthDate(JSON.parse(message.toString('utf-8')).timePublished);
@@ -175,6 +184,7 @@ class MqttAdapter {
 
         const newFileName = FileNameUtility.constructFileName(this.messageFilePath, yearMonthDate);
         this.messageSaver.changeFilePath(newFileName);
+        this.messageSaver.createFile(newFileName);
         this.currentYearMonthDate = yearMonthDate;
 
         this.messageSaver.saveMessage(message.toString('utf-8'));
@@ -184,16 +194,19 @@ class MqttAdapter {
 
       const newFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
       this.messageSaver.changeFilePath(newFileName);
+      this.messageSaver.createFile(newFileName);
       this.messageSaver.saveMessage(message.toString('utf-8'));
     }
+
   }
 
   /**
    * Ends the MQTT client connection.
    */
-  private endClient(): void {
+  public endClient(): void {
     this.client.end();
   }
+
 }
 
 export default MqttAdapter;
