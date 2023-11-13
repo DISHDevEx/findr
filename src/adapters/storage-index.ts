@@ -27,13 +27,13 @@ class DataTransferHandler {
    * @param s3Region - The AWS region.
    * @throws Error if the source-destination combination is unsupported.
    */
-  async fromMqttsToS3(
+  async fromIotToS3(
     localFilePath: string,
     s3Bucket: string,
     s3FileKey: string,
     s3Region: string
   ): Promise<void> {
-    if (this.source === 'mqtts' && this.destination === 's3') {
+    if (this.source !== null && this.destination === 's3') {
       const s3Uploader = new S3Uploader(s3Bucket, s3FileKey, s3Region);
       const fileStream = fs.createReadStream(localFilePath);
 
@@ -46,7 +46,7 @@ class DataTransferHandler {
         console.error('Error during upload:', error);
       }
     } else {
-      throw new Error('Failed to upload mqtts to s3');
+      throw new Error('Failed to upload to s3');
     }
   }
 }
