@@ -1,4 +1,10 @@
-import { extractYearMonthDate } from '../src/extract-year-month-date';
+/**
+ * extractYearMonthDate Test
+ *
+ * This test suite validates the behavior of the extractYearMonthDate function when
+ * extracting the year, month, and date from received message.
+ */
+import { extractYearMonthDate } from '../src/adapters/extract-year-month-date';
 
 describe('extractYearMonthDate', () => {
   it('should extract year, month, and date from a timestamp', () => {

@@ -1,6 +1,12 @@
+/**
+ * MQTT Test
+ *
+ * This test suite validates the behavior of the MqttAdapter class when transferring data
+ * from MQTT-S to storage services.
+ */
 import dotenv from 'dotenv';
 import path from 'path';
-import MqttAdapter from '../src/protocol-mqtt';
+import MqttAdapter from '../src/adapters/protocol-mqtt';
 import { MqttProtocol } from 'mqtt';
 import { promises as fsPromises} from 'fs';
 import { S3 } from 'aws-sdk';

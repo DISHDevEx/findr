@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "registry": "npm run compile && node ./registry-iot.js",
+    "adapter": "npm run compile && node ./dist/adapters/protocol-index.js",
     "test": "jest"
   },
   "keywords": [],

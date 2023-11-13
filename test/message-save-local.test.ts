@@ -1,4 +1,10 @@
-import { LocalMessageSaver } from '../src/message-save-local';
+/**
+ * LocalMessageSaver Test
+ *
+ * This test suite validates the behavior of the LocalMessageSaver class when saving data
+ * to local machine.
+ */
+import { LocalMessageSaver } from '../src/adapters/message-save-local';
 import fs from 'fs';
 import path from 'path';
 
