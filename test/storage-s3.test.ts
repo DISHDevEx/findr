@@ -5,7 +5,7 @@
  */
 
 import dotenv from 'dotenv';
-import { S3Uploader } from '../src/storage-s3';
+import { S3Uploader } from '../src/adapters/storage-s3';
 import { createReadStream, ReadStream } from 'fs';
 
 // Load environment variables from .env files in the test-env folder

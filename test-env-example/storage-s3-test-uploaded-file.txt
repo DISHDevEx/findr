@@ -1,0 +1,1 @@
+{"companyName":"abc","departmentName":"xyz","deviceId":123,"timePublished":"2023-11-07 09:57:16"}
