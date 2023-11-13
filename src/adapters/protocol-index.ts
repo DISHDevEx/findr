@@ -2,9 +2,10 @@
 import dotenv from 'dotenv';
 import { MqttProtocol } from 'mqtt';
 import MqttAdapter from './protocol-mqtt.js';
+import HttpAdapter from './protocol-http.js';
 
 // Load environment variables from the .env file
-dotenv.config({ path: 'test-env/protocol-index.env' });
+dotenv.config({ path: 'prod-env/protocol-index.env' });
 
 // Mandatory variables
 const SOURCE = process.env.SOURCE ?? '';
@@ -21,13 +22,14 @@ const PROTOCOL: MqttProtocol = process.env.PROTOCOL as MqttProtocol ?? '';
 const MESSAGE_FILE_PATH = process.env.MESSAGE_FILE_PATH ?? '';
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CA_FILE_PATH = process.env.CA_FILE_PATH ?? '';
+const HTTP_PORT_NUMBER = process.env.HTTP_PORT_NUMBER ?? '';
 const S3_BUCKET = process.env.S3_BUCKET ?? '';
 const S3_FILE_KEY = process.env.S3_FILE_KEY ?? '';
 const S3_REGION = process.env.S3_REGION ?? '';
 const TOPIC = process.env.TOPIC ?? '';
 
 // Check if SOURCE is 'mqtts'
-if (SOURCE === 'mqtts') {
+if (SOURCE === 'mqtts' && DESTINATION === 's3') {
   // MqttAdapter configuration
   const mqttAdapterConfig = {
     source: SOURCE,
@@ -46,6 +48,20 @@ if (SOURCE === 'mqtts') {
   // Create an instance of MqttAdapter
   const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
   mqttAdapter.startClient()
+} else if (SOURCE === 'http' && DESTINATION === 's3') {
+  // HTTP Protocol configuration
+  const httpProtocolConfig = {
+    source: SOURCE,
+    destination: DESTINATION,
+    httpPortNumber: HTTP_PORT_NUMBER,
+    s3Bucket: S3_BUCKET,
+    s3FileKey: S3_FILE_KEY,
+    s3Region: S3_REGION,
+  };
+
+  // Create an instance of ProtocolHTTP
+  const httpProtocol = new ProtocolHTTP(httpProtocolConfig);
+  httpProtocol.startServer();
 } else {
   console.error('Invalid source. Expected "mqtts".');
 }

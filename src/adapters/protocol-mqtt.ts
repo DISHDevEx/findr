@@ -175,7 +175,7 @@ class MqttAdapter {
       } else {
         if (this.destination === 's3' && this.s3Bucket !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
           const oldFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
-          this.dataTransferHandler.fromMqttsToS3(oldFileName, this.s3Bucket, this.s3FileKey, this.s3Region);
+          this.dataTransferHandler.fromIotToS3(oldFileName, this.s3Bucket, this.s3FileKey, this.s3Region);
         }
 
         const newFileName = FileNameUtility.constructFileName(this.messageFilePath, yearMonthDate);
