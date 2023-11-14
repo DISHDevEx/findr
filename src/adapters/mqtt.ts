@@ -20,6 +20,8 @@ interface MqttAdapterConfig {
   s3Bucket?: string;
   s3FileKey?: string;
   s3Region?: string;
+  dynamodbTableName?: string;
+  dynamodbRegion?: string;
   topic: string;
 }
 
@@ -103,6 +105,9 @@ class MqttAdapter {
    */
   private topic: string;
 
+  private dynamodbTableName?: string;
+  private dynamodbRegion?: string;
+
   /**
    * Creates an instance of MqttAdapter.
    * @param config - Configuration options for the MQTT Adapter.
@@ -119,6 +124,8 @@ class MqttAdapter {
     this.s3FileKey = config.s3FileKey;
     this.s3Region = config.s3Region;
     this.topic = config.topic;
+    this.dynamodbTableName = config.dynamodbTableName;
+    this.dynamodbRegion = config.dynamodbRegion;
     this.messageSaver = new LocalMessageSaver(this.messageFilePath);
     this.dataTransferHandler = new DataTransferHandler(this.source, this.destination);
   }
@@ -168,14 +175,18 @@ class MqttAdapter {
     console.log(`Received message on topic ${topic}: ${message.toString('utf-8')}`);
 
     const yearMonthDate = extractYearMonthDate(JSON.parse(message.toString('utf-8')).timePublished);
-
+    console.log(`yearMonthDate: ${yearMonthDate}`);
     if (this.currentYearMonthDate !== null) {
       if (this.currentYearMonthDate === yearMonthDate) {
         this.messageSaver.saveMessage(message.toString('utf-8'));
       } else {
+        const oldFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
         if (this.destination === 's3' && this.s3Bucket !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
-          const oldFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
-          this.dataTransferHandler.fromIotToS3(oldFileName, this.s3Bucket, this.s3FileKey, this.s3Region);
+            console.log(`Upload to s3 from mqtts`);
+            this.dataTransferHandler.fromIotToS3(oldFileName, this.s3Bucket, this.s3FileKey, this.s3Region);
+        } else if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
+            console.log(`Upload to dynamodb from mqtts`);
+            this.dataTransferHandler.fromIotToDynamoDB(this.dynamodbTableName, oldFileName, this.dynamodbRegion);
         }
 
         const newFileName = FileNameUtility.constructFileName(this.messageFilePath, yearMonthDate);
