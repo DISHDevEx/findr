@@ -1,10 +1,10 @@
 import { connect, IClientOptions, MqttProtocol } from 'mqtt';
 import { MqttClient } from 'mqtt';
 import { readFileSync } from 'fs';
-import { LocalMessageSaver } from './message-save-local.js';
-import { extractYearMonthDate } from './extract-year-month-date.js';
-import { FileNameUtility } from './filename-utility.js';
-import { DataTransferHandler } from './storage-index.js';
+import { LocalMessageSaver } from '../utilities/message-save-local.js';
+import { extractYearMonthDate } from '../utilities/extract-year-month-date.js';
+import { FileNameUtility } from '../utilities/filename-utility.js';
+import { DataTransferHandler } from '../storage-index.js';
 
 /**
  * Configuration options for the MQTT Adapter.
