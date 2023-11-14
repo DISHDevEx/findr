@@ -6,7 +6,7 @@
  */
 import dotenv from 'dotenv';
 import path from 'path';
-import MqttAdapter from '../src/adapters/protocol-mqtt';
+import MqttAdapter from '../src/adapters/mqtt';
 import { MqttProtocol } from 'mqtt';
 import { promises as fsPromises} from 'fs';
 import { S3 } from 'aws-sdk';

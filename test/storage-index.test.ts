@@ -4,7 +4,7 @@
  * This test suite validates the behavior of the DataTransferHandler class when transferring data
  * from MQTT-S to S3.
  */
-import { DataTransferHandler } from '../src/adapters/storage-index'; // Import the DataTransferHandler class
+import { DataTransferHandler } from '../src/storage-index'; // Import the DataTransferHandler class
 import dotenv from 'dotenv';
 
 // Load environment variables from the .env file

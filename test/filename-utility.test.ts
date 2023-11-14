@@ -4,7 +4,7 @@
  * This test suite validates the behavior of the FileNameUtility class when changing
  * file name based on received message.
  */
-import { FileNameUtility } from '../src/adapters/filename-utility';
+import { FileNameUtility } from '../src/utilities/filename-utility';
 
 describe('FileNameUtility', () => {
   it('should construct a file name without extension', () => {
