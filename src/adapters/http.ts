@@ -33,6 +33,8 @@ class HttpAdapter {
     private s3Region?: string;
 
     constructor(config: HttpAdapterConfig) {
+        this.source = config.source;
+        this.destination = config.destination;
         this.http = express();
         this.port = config.httpPortNumber;
         this.messageFilePath = config.messageFilePath;
@@ -61,14 +63,22 @@ class HttpAdapter {
         });
     }
     public handleMessage(data: Buffer): void {
-        console.log(`Received data: ${data.toString('utf-8')}`);
+        // console.log(`Received data: ${data.toString('utf-8')}`);
+        const dataJson = JSON.stringify(data);
+        console.log(`Received data: ${dataJson}`);
+        console.log(`timePublished: ${JSON.parse(dataJson).timePublished}`);
     
-        const yearMonthDate = extractYearMonthDate(JSON.parse(data.toString('utf-8')).timePublished);
+        const yearMonthDate = extractYearMonthDate(JSON.parse(dataJson).timePublished);
+        console.log(`yearMonthDate: ${yearMonthDate}`);
     
         if (this.currentYearMonthDate !== null) {
           if (this.currentYearMonthDate === yearMonthDate) {
-            this.messageSaver.saveMessage(data.toString('utf-8'));
+            this.messageSaver.saveMessage(dataJson);
           } else {
+            console.log(`this.destination: ${this.destination}`);
+            console.log(`this.s3Bucket: ${this.s3Bucket}`);
+            console.log(`this.s3FileKey: ${this.s3FileKey}`);
+            console.log(`this.s3Region: ${this.s3Region}`);
             if (this.destination === 's3' && this.s3Bucket !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
               const oldFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
               this.dataTransferHandler.fromIotToS3(oldFileName, this.s3Bucket, this.s3FileKey, this.s3Region);
@@ -79,7 +89,7 @@ class HttpAdapter {
             this.messageSaver.createFile(newFileName);
             this.currentYearMonthDate = yearMonthDate;
     
-            this.messageSaver.saveMessage(data.toString('utf-8'));
+            this.messageSaver.saveMessage(dataJson);
           }
         } else {
           this.currentYearMonthDate = yearMonthDate;
@@ -87,7 +97,7 @@ class HttpAdapter {
           const newFileName = FileNameUtility.constructFileName(this.messageFilePath, this.currentYearMonthDate);
           this.messageSaver.changeFilePath(newFileName);
           this.messageSaver.createFile(newFileName);
-          this.messageSaver.saveMessage(data.toString('utf-8'));
+          this.messageSaver.saveMessage(dataJson);
         }
     
       }
