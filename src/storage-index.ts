@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { S3Uploader } from './storage-s3.js';
+import { S3Uploader } from './adapters/storage-s3.js';
 
 /**
  * Represents a handler for transferring data based on source and destination.

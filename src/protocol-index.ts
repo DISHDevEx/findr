@@ -31,6 +31,7 @@ const TOPIC = process.env.TOPIC ?? '';
 // Check if SOURCE is 'mqtts'
 if (SOURCE === 'mqtts' && DESTINATION === 's3') {
   // MqttAdapter configuration
+  console.log('Configuring MqttAdapter');
   const mqttAdapterConfig = {
     source: SOURCE,
     destination: DESTINATION,
@@ -49,19 +50,21 @@ if (SOURCE === 'mqtts' && DESTINATION === 's3') {
   const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
   mqttAdapter.startClient()
 } else if (SOURCE === 'http' && DESTINATION === 's3') {
-  // HTTP Protocol configuration
-  const httpProtocolConfig = {
+  // HttpAdapter configuration
+  console.log('Configuring HttpAdapter');
+  const httpAdapterConfig = {
     source: SOURCE,
     destination: DESTINATION,
-    httpPortNumber: HTTP_PORT_NUMBER,
+    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
+    messageFilePath: MESSAGE_FILE_PATH,
     s3Bucket: S3_BUCKET,
     s3FileKey: S3_FILE_KEY,
     s3Region: S3_REGION,
   };
 
-  // Create an instance of ProtocolHTTP
-  const httpProtocol = new ProtocolHTTP(httpProtocolConfig);
-  httpProtocol.startServer();
+  // Create an instance of HttpAdapter
+  const httpAdapter = new HttpAdapter(httpAdapterConfig);
+  httpAdapter.startServer();
 } else {
-  console.error('Invalid source. Expected "mqtts".');
+  console.error('Invalid source. Expected "mqtts" or "http".');
 }

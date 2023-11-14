@@ -5,12 +5,12 @@ This directory contains adapters for handling traffic from IoT devices and manag
 ## Files
 
 - **protocol-index.ts**: Entry point for handling traffic. Determines the downstream protocol and invokes the associated protocol class.
-- **protocol-mqtt.ts**: Manages downstream and upstream connections for MQTT protocol.
+- **adapters/mqtt.ts**: Manages downstream and upstream connections for MQTT protocol.
 - **storage-index.ts**: Determines the direction of traffic (downstream or upstream) and invokes the appropriate storage service.
-- **storage-s3.ts**: Handles file upload and download from the local machine to the S3 storage service.
-- **message-save-local.ts**: Helper function to save received messages locally with updated filenames based on timestamps.
-- **filename-utility.ts**: Helper utility for managing filenames.
-- **extract-year-month-date.ts**: Helper function for extracting year, month, and date from timestamps in received message.
+- **adapters/s3.ts**: Handles file upload and download from the local machine to the S3 storage service.
+- **utilities/message-save-local.ts**: Helper function to save received messages locally with updated filenames based on timestamps.
+- **utilities/filename-utility.ts**: Helper utility for managing filenames.
+- **utilities/extract-year-month-date.ts**: Helper function for extracting year, month, and date from timestamps in received message.
 
 ## How to Use
 
