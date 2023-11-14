@@ -1,8 +1,8 @@
 // Import necessary modules
 import dotenv from 'dotenv';
 import { MqttProtocol } from 'mqtt';
-import MqttAdapter from './protocol-mqtt.js';
-import HttpAdapter from './protocol-http.js';
+import MqttAdapter from './adapters/mqtt.js';
+import HttpAdapter from './adapters/http.js';
 
 // Load environment variables from the .env file
 dotenv.config({ path: 'prod-env/protocol-index.env' });
@@ -23,10 +23,13 @@ const MESSAGE_FILE_PATH = process.env.MESSAGE_FILE_PATH ?? '';
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CA_FILE_PATH = process.env.CA_FILE_PATH ?? '';
 const HTTP_PORT_NUMBER = process.env.HTTP_PORT_NUMBER ?? '';
+const HTTP_ROUTE = process.env.HTTP_ROUTE ?? '';
 const S3_BUCKET = process.env.S3_BUCKET ?? '';
 const S3_FILE_KEY = process.env.S3_FILE_KEY ?? '';
 const S3_REGION = process.env.S3_REGION ?? '';
 const TOPIC = process.env.TOPIC ?? '';
+const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME ?? '';
+const DYNAMODB_REGION = process.env.DYNAMODB_REGION ?? '';
 
 // Check if SOURCE is 'mqtts'
 if (SOURCE === 'mqtts' && DESTINATION === 's3') {
@@ -49,17 +52,53 @@ if (SOURCE === 'mqtts' && DESTINATION === 's3') {
   // Create an instance of MqttAdapter
   const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
   mqttAdapter.startClient()
-} else if (SOURCE === 'http' && DESTINATION === 's3') {
+} else if (SOURCE === 'mqtts' && DESTINATION === 'dynamodb') {
+  // MqttAdapter configuration
+  console.log('Configuring MqttAdapter');
+  const mqttAdapterConfig = {
+    source: SOURCE,
+    destination: DESTINATION,
+    mqttBroker: MQTT_BROKER,
+    protocol: PROTOCOL,
+    messageFilePath: MESSAGE_FILE_PATH,
+    clientId: CLIENT_ID,
+    caFilePath: CA_FILE_PATH,
+    dynamodbTableName: DYNAMODB_TABLE_NAME,
+    dynamodbRegion: DYNAMODB_REGION,
+    topic: TOPIC,
+  };
+
+  // Create an instance of MqttAdapter
+  const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
+  mqttAdapter.startClient()
+}else if (SOURCE === 'http' && DESTINATION === 's3') {
   // HttpAdapter configuration
   console.log('Configuring HttpAdapter');
   const httpAdapterConfig = {
     source: SOURCE,
     destination: DESTINATION,
     httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
+    httpRoute: HTTP_ROUTE,
     messageFilePath: MESSAGE_FILE_PATH,
     s3Bucket: S3_BUCKET,
     s3FileKey: S3_FILE_KEY,
     s3Region: S3_REGION,
+  };
+
+  // Create an instance of HttpAdapter
+  const httpAdapter = new HttpAdapter(httpAdapterConfig);
+  httpAdapter.startServer();
+} else if (SOURCE === 'http' && DESTINATION === 'dynamodb') {
+  // HttpAdapter configuration
+  console.log('Configuring HttpAdapter');
+  const httpAdapterConfig = {
+    source: SOURCE,
+    destination: DESTINATION,
+    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
+    httpRoute: HTTP_ROUTE,
+    messageFilePath: MESSAGE_FILE_PATH,
+    dynamodbTableName: DYNAMODB_TABLE_NAME,
+    dynamodbRegion: DYNAMODB_REGION,
   };
 
   // Create an instance of HttpAdapter

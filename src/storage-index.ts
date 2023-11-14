@@ -1,5 +1,6 @@
 import fs from 'fs';
-import { S3Uploader } from './adapters/storage-s3.js';
+import { S3Uploader } from './adapters/s3.js';
+import { DynamoDBUploader } from './adapters/dynamodb.js';
 
 /**
  * Represents a handler for transferring data based on source and destination.
@@ -47,6 +48,28 @@ class DataTransferHandler {
       }
     } else {
       throw new Error('Failed to upload to s3');
+    }
+  }
+
+
+  async fromIotToDynamoDB(
+    tableName: string,
+    localFilePath: string,
+    dynamoDBRegion: string
+  ): Promise<void> {
+    if (this.source !== null && this.destination === 'dynamodb') {
+      const dynamoDBUploader = new DynamoDBUploader(tableName, localFilePath, dynamoDBRegion);
+      console.log('uploading to dynamodb in storage-index.ts');
+      try {
+        await dynamoDBUploader.uploadToDynamoDB();
+        // After successful upload, delete the local file
+        fs.unlinkSync(localFilePath);
+      } catch (error) {
+        // Handle any potential errors here
+        console.error('Error during upload:', error);
+      }
+    } else {
+      throw new Error('Failed to upload to dynamodb');
     }
   }
 }
