@@ -1,3 +1,32 @@
+# Updated repo structure:
+
+project-root/
+│
+├── src/
+│   ├── adapters/
+│   │   ├── adapters.ts
+│   │
+│   ├── connections_folder/
+│       ├── mqtts-to-s3.ts
+│       ├── mqtts-to-dynamodb.ts
+│       ├── http-to-s3.ts
+│       ├── http-to-dynamodb.ts
+│       ├── processors.ts
+
+
+### Adapters
+
+- `adapters.ts`: Main file for managing adapters.
+
+### Connections Folder
+
+- `mqtts-to-s3.ts`: Module for connecting MQTT data to S3.
+- `mqtts-to-dynamodb.ts`: Module for connecting MQTT data to DynamoDB.
+- `http-to-s3.ts`: Module for connecting HTTP data to S3.
+- `http-to-dynamodb.ts`: Module for connecting HTTP data to DynamoDB.
+- `processors.ts`: File containing data processors.
+
+
 # Adapters
 
 This directory contains adapters for handling traffic from IoT devices and managing communication with storage services. These files are written in typescript.
