@@ -9,16 +9,16 @@ import { S3Uploader } from '../src/adapters/s3';
 import { createReadStream, ReadStream } from 'fs';
 
 // Load environment variables from .env files in the test-env folder
-dotenv.config({ path: 'test-env/storage-s3-test.env' });
+dotenv.config({ path: 'test-env/test.env' });
 
 /**
  * Retrieve and validate environment variables for Amazon S3 configuration.
  * Ensure that all required variables are defined to run the tests.
  */
-const bucketName: string = process.env.BUCKET_NAME ?? '';
-const fileKey: string = process.env.FILE_KEY ?? '';
-const region: string = process.env.REGION ?? '';
-const testFilePath: string = process.env.TEST_FILE_PATH ?? '';
+const bucketName: string = process.env.S3_BUCKET ?? '';
+const fileKey: string = process.env.S3_FILE_KEY ?? '';
+const region: string = process.env.S3_REGION ?? '';
+const testFilePath: string = process.env.LOCAL_FILE_PATH ?? '';
 
 if (!bucketName || !fileKey || !region || !testFilePath) {
   throw new Error('Missing required environment variables.');
