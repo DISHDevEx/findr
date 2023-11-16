@@ -1,17 +1,25 @@
 # Updated repo structure:
-
-project-root/
+```
+findr/
 │
 ├── src/
-│   ├── adapters/
-│   │   ├── adapters.ts
+│   ├── adapters.ts
 │   │
-│   ├── connections_folder/
+│   ├── adapters/
+│   │   ├── mqtt.ts
+│   │   ├── http.ts
+│   │   ├── s3.ts
+│   │   ├── dynamodb.ts
+│   │
+│   ├── connections/
 │       ├── mqtts-to-s3.ts
 │       ├── mqtts-to-dynamodb.ts
 │       ├── http-to-s3.ts
 │       ├── http-to-dynamodb.ts
 │       ├── processors.ts
+
+```
+
 
 
 ### Adapters
