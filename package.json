@@ -10,6 +10,9 @@
     "adapter": "npm run compile && node ./dist/adapters/protocol-index.js",
     "test": "jest"
   },
+  "jest": {
+    "preset": "ts-jest"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

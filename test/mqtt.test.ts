@@ -13,16 +13,17 @@ import { S3 } from 'aws-sdk';
 import fs from 'fs';
 
 // Load environment variables from .env files in the test-env folder
-dotenv.config({ path: 'test-env/protocol-mqtt-test.env' });
+dotenv.config({ path: 'test-env/test.env' });
 
 
 
 describe('MqttAdapter', () => {
 
-    const SOURCE = process.env.SOURCE ?? '';
-    const DESTINATION = process.env.DESTINATION ?? '';
+    const SOURCE_MQTTS = process.env.SOURCE_MQTTS ?? '';
+    const DESTINATION_S3 = process.env.DESTINATION_S3 ?? '';
+    // const DESTINATION_DYNAMODB = process.env.DESTINATION_DYNAMODB ?? '';
     const PROTOCOL: MqttProtocol = process.env.PROTOCOL as MqttProtocol ?? '';
-    const MESSAGE_FILE_PATH = process.env.MESSAGE_FILE_PATH ?? '';
+    const FILE_PATH = process.env.LOCAL_FILE_PATH ?? '';
     const CLIENT_ID = process.env.CLIENT_ID ?? '';
     const MQTT_BROKER = process.env.MQTT_BROKER ?? '';
     const CA_FILE_PATH = process.env.CA_FILE_PATH ?? '';
@@ -30,13 +31,17 @@ describe('MqttAdapter', () => {
     const S3_FILE_KEY = process.env.S3_FILE_KEY ?? '';
     const S3_REGION = process.env.S3_REGION ?? '';
     const TOPIC = process.env.TOPIC ?? '';
+    // const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME ?? '';
+    // const DYNAMODB_REGION = process.env.DYNAMODB_REGION ?? '';
+    // const HTTP_PORT_NUMBER = process.env.HTTP_PORT_NUMBER ?? '';
+    // const HTTP_ROUTE = process.env.HTTP_ROUTE ?? '';
 
 
-  const mqttAdapterConfig = {
-    source: SOURCE!,
-    destination: DESTINATION!,
+  const mqttS3AdapterConfig = {
+    source: SOURCE_MQTTS!,
+    destination: DESTINATION_S3!,
     protocol: PROTOCOL!,
-    messageFilePath: MESSAGE_FILE_PATH!,
+    messageFilePath: FILE_PATH!,
     clientId: CLIENT_ID!,
     mqttBroker: MQTT_BROKER!,
     caFilePath: CA_FILE_PATH!,
@@ -46,25 +51,26 @@ describe('MqttAdapter', () => {
     topic: TOPIC!,
   };
 
-  let mqttAdapter: MqttAdapter;
+  let mqttS3Adapter: MqttAdapter;
   const currentDirectory = process.cwd();
   const messageA = '{"companyName":"abc","departmentName":"xyz","deviceId":123,"timePublished":"2023-11-07 09:57:16"}';
   const messageB = '{"companyName":"abc","departmentName":"xyz","deviceId":123,"timePublished":"2023-11-07 09:57:17"}';
   const messageC = '{"companyName":"abc","departmentName":"xyz","deviceId":123,"timePublished":"2023-11-08 09:57:16"}';
 
   const expectedDateA = messageA ? JSON.parse(messageA).timePublished.split(' ')[0] : ''; // Extract date from messageA
-  const expectedFileNameA = `${path.dirname(MESSAGE_FILE_PATH)}/${path.basename(MESSAGE_FILE_PATH, path.extname(MESSAGE_FILE_PATH))}_${expectedDateA}${path.extname(MESSAGE_FILE_PATH)}`;
+  const expectedFileNameA = `${path.dirname(FILE_PATH)}/${path.basename(FILE_PATH, path.extname(FILE_PATH))}_${expectedDateA}${path.extname(FILE_PATH)}`;
   const filePathA = path.join(currentDirectory, expectedFileNameA);
 
   beforeAll(() => {
-    mqttAdapter = new MqttAdapter(mqttAdapterConfig);
+    mqttS3Adapter = new MqttAdapter(mqttS3AdapterConfig);
   });
 
   afterAll(async () => {
     // End the MQTT client connection after all tests
-    mqttAdapter.endClient();
+    mqttS3Adapter.endClient();
+    mqttDynamodbAdapter.endClient();
     // Construct the file path to be deleted
-    const fileToDelete = path.join(currentDirectory, 'test-env', 'protocol-mqtt-test-local-saved-file_2023-11-08.txt');
+    const fileToDelete = path.join(currentDirectory, 'test-env', 'test-local-file_2023-11-08.txt');
 
     try {
         // Try to unlink (delete) the file
@@ -78,13 +84,13 @@ describe('MqttAdapter', () => {
 
   it('should start the MQTT client', async () => {
     // Call the startClient method
-    mqttAdapter.startClient();
+    mqttS3Adapter.startClient();
 
     // Wait for the client to connect (you might need to adjust the delay)
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Verify that the client is connected
-    expect(mqttAdapter['client'].connected).toBe(true);
+    expect(mqttS3Adapter['client'].connected).toBe(true);
 
   });
 
@@ -92,7 +98,7 @@ describe('MqttAdapter', () => {
 
     // Use the same MQTT client instance to publish messages
     const messageBufferA = Buffer.from(messageA);
-    mqttAdapter.handleMessage(TOPIC, messageBufferA);
+    mqttS3Adapter.handleMessage(TOPIC, messageBufferA);
 
     // Wait for messageA to be processed
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -123,7 +129,7 @@ describe('MqttAdapter', () => {
 
     // Use the same MQTT client instance to publish messages
     const messageBufferB = Buffer.from(messageB);
-    mqttAdapter.handleMessage(TOPIC, messageBufferB);
+    mqttS3Adapter.handleMessage(TOPIC, messageBufferB);
 
     // Wait for messageA to be processed
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -154,13 +160,13 @@ describe('MqttAdapter', () => {
 
     // Use the same MQTT client instance to publish messages
     const messageBufferC = Buffer.from(messageC);
-    mqttAdapter.handleMessage(TOPIC, messageBufferC);
+    mqttS3Adapter.handleMessage(TOPIC, messageBufferC);
 
     // Wait for messageA to be processed
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const expectedDateC = messageC ? JSON.parse(messageC).timePublished.split(' ')[0] : ''; // Extract date from messageA
-    const expectedFileNameC = `${path.dirname(MESSAGE_FILE_PATH)}/${path.basename(MESSAGE_FILE_PATH, path.extname(MESSAGE_FILE_PATH))}_${expectedDateC}${path.extname(MESSAGE_FILE_PATH)}`;
+    const expectedFileNameC = `${path.dirname(FILE_PATH)}/${path.basename(FILE_PATH, path.extname(FILE_PATH))}_${expectedDateC}${path.extname(FILE_PATH)}`;
     const filePathC = path.join(currentDirectory, expectedFileNameC);
     
     try {
@@ -192,7 +198,7 @@ describe('MqttAdapter', () => {
     
 
     // Check if the upload object exists in S3
-    if (DESTINATION === 's3' && S3_BUCKET !== undefined && S3_FILE_KEY !== undefined && S3_REGION !== undefined) {
+    if (DESTINATION_S3 === 's3' && S3_BUCKET !== undefined && S3_FILE_KEY !== undefined && S3_REGION !== undefined) {
         const s3 = new S3({ region: S3_REGION });
         const s3ObjectKey = `${path.dirname(S3_FILE_KEY)}/${path.basename(S3_FILE_KEY, path.extname(S3_FILE_KEY))}${path.extname(S3_FILE_KEY)}`;
         try {

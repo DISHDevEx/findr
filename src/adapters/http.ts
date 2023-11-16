@@ -112,6 +112,10 @@ class HttpAdapter {
           console.log(`Server is running on http://localhost:${this.port}`);
       });
   }
+
+  public stopServer(): void {
+    this.http.close();
+  }
 }
 
 export default HttpAdapter;
