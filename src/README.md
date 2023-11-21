@@ -6,17 +6,18 @@ findr/
 │   ├── adapters.ts
 │   │
 │   ├── adapters/
-│   │   ├── mqtt.ts
+│   │   ├── mqtts.ts
 │   │   ├── http.ts
 │   │   ├── s3.ts
 │   │   ├── dynamodb.ts
 │   │
-│   ├── connections/
-│       ├── mqtts-to-s3.ts
-│       ├── mqtts-to-dynamodb.ts
-│       ├── http-to-s3.ts
-│       ├── http-to-dynamodb.ts
-│       ├── processors.ts
+│   ├── connections.ts
+│   │
+│   ├── processors.ts    
+│       
+│       
+│       
+│       
 
 ```
 
