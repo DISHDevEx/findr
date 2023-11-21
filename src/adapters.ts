@@ -1,109 +1,88 @@
-// Import necessary modules
-import dotenv from 'dotenv';
-import { MqttProtocol } from 'mqtt';
-import MqttAdapter from './adapters/mqtt.js';
-import HttpAdapter from './adapters/http.js';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import Connection from './connection.js';
 
-// Load environment variables from the .env file
-dotenv.config({ path: 'prod-env/protocol-index.env' });
+const app = express();
+const port = process.env.API_PORT || 8080;
 
-// Mandatory variables
-const SOURCE = process.env.SOURCE ?? '';
-const DESTINATION = process.env.DESTINATION ?? '';
+app.use(cors()); // Enable CORS for all routes
 
-// Check if SOURCE and DESTINATION are defined
-if (SOURCE === undefined && DESTINATION === undefined) {
-  console.error('SOURCE and DESTINATION are mandatory variables. Please check your environment.');
-  process.exit(1); // Exit the process with an error code
-}
+app.use(express.json()); // Middleware to parse JSON request body
 
-const MQTT_BROKER = process.env.MQTT_BROKER ?? '';
-const PROTOCOL: MqttProtocol = process.env.PROTOCOL as MqttProtocol ?? '';
-const MESSAGE_FILE_PATH = process.env.MESSAGE_FILE_PATH ?? '';
-const CLIENT_ID = process.env.CLIENT_ID ?? '';
-const CA_FILE_PATH = process.env.CA_FILE_PATH ?? '';
-const HTTP_PORT_NUMBER = process.env.HTTP_PORT_NUMBER ?? '';
-const HTTP_ROUTE = process.env.HTTP_ROUTE ?? '';
-const S3_BUCKET = process.env.S3_BUCKET ?? '';
-const S3_FILE_KEY = process.env.S3_FILE_KEY ?? '';
-const S3_REGION = process.env.S3_REGION ?? '';
-const TOPIC = process.env.TOPIC ?? '';
-const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME ?? '';
-const DYNAMODB_REGION = process.env.DYNAMODB_REGION ?? '';
+// Define the endpoint to trigger the adapters
+app.post('/trigger-adapters', (req: Request, res: Response) => {
+  // Extract parameters from the request body
+  const {
+    source,
+    destination,
+    localFilePath,
+    mqttsBroker,
+    topic,
+    clientId,
+    caFilePath,
+    httpPortNumber,
+    httpRoute,
+    s3BucketName,
+    s3FileKey,
+    s3Region,
+    dynamodbTableName,
+    dynamodbRegion,
+  } = req.body;
 
-// Check if SOURCE is 'mqtts'
-if (SOURCE === 'mqtts' && DESTINATION === 's3') {
-  // MqttAdapter configuration
-  console.log('Configuring MqttAdapter');
-  const mqttAdapterConfig = {
-    source: SOURCE,
-    destination: DESTINATION,
-    mqttBroker: MQTT_BROKER,
-    protocol: PROTOCOL,
-    messageFilePath: MESSAGE_FILE_PATH,
-    clientId: CLIENT_ID,
-    caFilePath: CA_FILE_PATH,
-    s3Bucket: S3_BUCKET,
-    s3FileKey: S3_FILE_KEY,
-    s3Region: S3_REGION,
-    topic: TOPIC,
-  };
+  // Check if SOURCE and DESTINATION are defined
+  if (source === undefined || destination === undefined) {
+    return res.status(400).json({ error: 'SOURCE and DESTINATION are mandatory parameters.' });
+  }
 
-  // Create an instance of MqttAdapter
-  const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
-  mqttAdapter.startClient()
-} else if (SOURCE === 'mqtts' && DESTINATION === 'dynamodb') {
-  // MqttAdapter configuration
-  console.log('Configuring MqttAdapter');
-  const mqttAdapterConfig = {
-    source: SOURCE,
-    destination: DESTINATION,
-    mqttBroker: MQTT_BROKER,
-    protocol: PROTOCOL,
-    messageFilePath: MESSAGE_FILE_PATH,
-    clientId: CLIENT_ID,
-    caFilePath: CA_FILE_PATH,
-    dynamodbTableName: DYNAMODB_TABLE_NAME,
-    dynamodbRegion: DYNAMODB_REGION,
-    topic: TOPIC,
-  };
+  // Your existing logic to start adapters based on parameters
+  if (source === 'mqtts') {
+    const connectionConfig = {
+      destination: destination,
+      localFilePath: localFilePath,
+      mqttsBroker: mqttsBroker,
+      clientId: clientId,
+      caFilePath: caFilePath,
+      topic: topic,
+      s3BucketName: s3BucketName,
+      s3FileKey: s3FileKey,
+      s3Region: s3Region,
+      dynamodbTableName: dynamodbTableName,
+      dynamodbRegion: dynamodbRegion,
+    };
+    try {
+      const connection = new Connection(connectionConfig);
+      connection.startMqtts();
+      return res.status(200).json({ message: 'MQTTS connection started successfully' });
+    } catch (error) {
+      // Handle any potential errors here
+      return res.status(400).json({ 'Error on starting MQTTS adapter:': error });
+    }
+  } else if (source === 'http') {
+    const connectionConfig = {
+      destination: destination,
+      localFilePath: localFilePath,
+      httpPortNumber: parseInt(httpPortNumber, 10),
+      httpRoute: httpRoute,
+      s3BucketName: s3BucketName,
+      s3FileKey: s3FileKey,
+      s3Region: s3Region,
+      dynamodbTableName: dynamodbTableName,
+      dynamodbRegion: dynamodbRegion,
+    };
+    try {
+      const connection = new Connection(connectionConfig);
+      connection.startHttp();
+      return res.status(200).json({ message: 'HTTP connection started successfully' });
+    } catch (error) {
+      // Handle any potential errors here
+      return res.status(400).json({ 'Error on starting HTTP adapter:': error });
+    }
+  } else {
+    return res.status(400).json({ error: 'Invalid source. Expected "mqtts" or "http".' });
+  }
+});
 
-  // Create an instance of MqttAdapter
-  const mqttAdapter = new MqttAdapter(mqttAdapterConfig);
-  mqttAdapter.startClient()
-}else if (SOURCE === 'http' && DESTINATION === 's3') {
-  // HttpAdapter configuration
-  console.log('Configuring HttpAdapter');
-  const httpAdapterConfig = {
-    source: SOURCE,
-    destination: DESTINATION,
-    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
-    httpRoute: HTTP_ROUTE,
-    messageFilePath: MESSAGE_FILE_PATH,
-    s3Bucket: S3_BUCKET,
-    s3FileKey: S3_FILE_KEY,
-    s3Region: S3_REGION,
-  };
-
-  // Create an instance of HttpAdapter
-  const httpAdapter = new HttpAdapter(httpAdapterConfig);
-  httpAdapter.startServer();
-} else if (SOURCE === 'http' && DESTINATION === 'dynamodb') {
-  // HttpAdapter configuration
-  console.log('Configuring HttpAdapter');
-  const httpAdapterConfig = {
-    source: SOURCE,
-    destination: DESTINATION,
-    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
-    httpRoute: HTTP_ROUTE,
-    messageFilePath: MESSAGE_FILE_PATH,
-    dynamodbTableName: DYNAMODB_TABLE_NAME,
-    dynamodbRegion: DYNAMODB_REGION,
-  };
-
-  // Create an instance of HttpAdapter
-  const httpAdapter = new HttpAdapter(httpAdapterConfig);
-  httpAdapter.startServer();
-} else {
-  console.error('Invalid source. Expected "mqtts" or "http".');
-}
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
