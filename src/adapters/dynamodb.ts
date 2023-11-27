@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { DynamoDBClient, PutItemCommand, type PutItemOutput } from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient, PutItemCommand, type PutItemOutput , type PutItemCommandInput} from '@aws-sdk/client-dynamodb'
 
 /**
  * DynamoDBUploader is a class for uploading data to an Amazon DynamoDB table.
@@ -60,7 +60,7 @@ export class DynamoDBUploader {
         const data = JSON.parse(line)
 
         // Define the parameters for the PutItem command
-        const params: PutItemCommand = {
+        const params: PutItemCommandInput = {
           TableName: this.tableName,
           Item: {
             companyName: { S: data.companyName },
@@ -72,12 +72,8 @@ export class DynamoDBUploader {
           }
         }
 
-        // Create the PutItem command
-        const command = new PutItemCommand(params)
-
-        // Execute the PutItem command
         try {
-          const result: PutItemOutput = await this.dynamoDBClient.send(command)
+          const result: PutItemOutput = await this.dynamoDBClient.send(new PutItemCommand(params))
           console.log('Item uploaded:', result)
         } catch (error) {
           console.error('Error uploading item:', error)
