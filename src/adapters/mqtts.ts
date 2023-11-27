@@ -1,5 +1,5 @@
-import { connect, IClientOptions, MqttClient } from 'mqtt';
-import { readFileSync } from 'fs';
+import { connect, type IClientOptions, type MqttClient } from 'mqtt'
+import { readFileSync } from 'fs'
 
 /**
  * MqttsAdapter is a class for interacting with an MQTT broker using MQTT over TLS (mqtts).
@@ -10,42 +10,42 @@ class MqttsAdapter {
    * @type {string}
    * @private
    */
-  private mqttsBroker: string;
+  private readonly mqttsBroker: string
 
   /**
    * MQTT client instance.
    * @type {MqttClient}
    * @private
    */
-  private client: MqttClient;
+  private client: MqttClient
 
   /**
    * MQTT client ID.
    * @type {string}
    * @private
    */
-  private clientId: string;
+  private readonly clientId: string
 
   /**
    * Path to the Certificate Authority (CA) file for secure communication.
    * @type {string}
    * @private
    */
-  private caFilePath: string;
+  private readonly caFilePath: string
 
   /**
    * MQTT topic to subscribe to.
    * @type {string}
    * @private
    */
-  private topic: string;
+  private readonly topic: string
 
   /**
    * Callback function to process received MQTT messages.
    * @type {(receivedTopic: string, message: object) => void}
    * @private
    */
-  private receiveMqttsMessage: (receivedTopic: string, message: object) => void;
+  private readonly receiveMqttsMessage: (receivedTopic: string, message: object) => void
 
   /**
    * Creates an instance of MqttsAdapter.
@@ -56,53 +56,53 @@ class MqttsAdapter {
    * @param {string} topic - MQTT topic.
    * @param {(receivedTopic: string, message: object) => void} receiveMqttsMessage - Callback function to process received MQTT messages.
    */
-  constructor(
+  constructor (
     mqttsBroker: string,
     clientId: string,
     caFilePath: string,
     topic: string,
-    receiveMqttsMessage: (receivedTopic: string, message: object) => void,
+    receiveMqttsMessage: (receivedTopic: string, message: object) => void
   ) {
-    this.mqttsBroker = mqttsBroker;
-    this.clientId = clientId;
-    this.caFilePath = caFilePath;
-    this.topic = topic;
-    this.receiveMqttsMessage = receiveMqttsMessage;
+    this.mqttsBroker = mqttsBroker
+    this.clientId = clientId
+    this.caFilePath = caFilePath
+    this.topic = topic
+    this.receiveMqttsMessage = receiveMqttsMessage
   }
 
   /**
    * Connects the MQTT client to the broker.
    * @private
    */
-  private connectClient(): void {
+  private connectClient (): void {
     const options: IClientOptions = {
       clientId: this.clientId,
       ca: [readFileSync(this.caFilePath)],
-      rejectUnauthorized: false,
-    };
+      rejectUnauthorized: false
+    }
 
-    console.log('Attempting to create a client in MqttsAdapter.ts');
-    this.client = connect(this.mqttsBroker, options);
-    console.log('Client created in MqttsAdapter.ts');
+    console.log('Attempting to create a client in MqttsAdapter.ts')
+    this.client = connect(this.mqttsBroker, options)
+    console.log('Client created in MqttsAdapter.ts')
 
-    console.log('Attempting to connect to MQTT broker in MqttsAdapter.ts');
+    console.log('Attempting to connect to MQTT broker in MqttsAdapter.ts')
     this.client.on('connect', () => {
-      console.log('Connected to MQTT broker');
-      this.subscribeToTopic(this.topic);
+      console.log('Connected to MQTT broker')
+      this.subscribeToTopic(this.topic)
 
-      this.client!.on('message', async (receivedTopic, message) => {
-        await this.receiveMqttsMessage(receivedTopic, message);
-      });
-    });
+      this.client.on('message', (receivedTopic, message) => {
+        this.receiveMqttsMessage(receivedTopic, message)
+      })
+    })
   }
 
   /**
    * Starts the MQTT client.
    */
-  public startClient(): void {
-    console.log('Attempting to connectClient() in MqttsAdapter.ts');
-    this.connectClient();
-    console.log('connectClient() complete in MqttsAdapter.ts');
+  public startClient (): void {
+    console.log('Attempting to connectClient() in MqttsAdapter.ts')
+    this.connectClient()
+    console.log('connectClient() complete in MqttsAdapter.ts')
   }
 
   /**
@@ -110,15 +110,15 @@ class MqttsAdapter {
    * @param {string} topic - The MQTT topic to subscribe to.
    * @private
    */
-  private subscribeToTopic(topic: string): void {
+  private subscribeToTopic (topic: string): void {
     this.client.subscribe(topic, (err) => {
       if (err === null) {
-        console.log(`Subscriber subscribed to ${this.topic} topic`);
+        console.log(`Subscriber subscribed to ${this.topic} topic`)
       } else {
-        console.error(`Error subscribing to ${this.topic} topic: ${err}`);
+        console.error(`Error subscribing to ${this.topic} topic: ${err}`)
       }
-    });
+    })
   }
 }
 
-export default MqttsAdapter;
+export default MqttsAdapter

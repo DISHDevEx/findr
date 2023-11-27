@@ -1,13 +1,14 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import Connection from './connection.js';
+import express, { type Request, type Response } from 'express'
+import cors from 'cors'
+import Connection from './connection.js'
 
-const app = express();
-const port = process.env.API_PORT || 8080;
+const app = express()
+// Ensure the value is not null or undefined before using it
+const port = parseInt(process.env.API_PORT ?? '8080', 10)
 
-app.use(cors()); // Enable CORS for all routes
+app.use(cors()) // Enable CORS for all routes
 
-app.use(express.json()); // Middleware to parse JSON request body
+app.use(express.json()) // Middleware to parse JSON request body
 
 /**
  * Defines the endpoint to trigger the adapters based on the provided configuration.
@@ -43,63 +44,63 @@ app.post('/trigger-adapters', (req: Request, res: Response) => {
     s3FileKey,
     s3Region,
     dynamodbTableName,
-    dynamodbRegion,
-  } = req.body;
+    dynamodbRegion
+  } = req.body
 
   // Check if SOURCE and DESTINATION are defined
   if (source === undefined || destination === undefined) {
-    return res.status(400).json({ error: 'SOURCE and DESTINATION are mandatory parameters.' });
+    return res.status(400).json({ error: 'SOURCE and DESTINATION are mandatory parameters.' })
   }
 
   // Your existing logic to start adapters based on parameters
   if (source === 'mqtts') {
     const connectionConfig = {
-      destination: destination,
-      localFilePath: localFilePath,
-      mqttsBroker: mqttsBroker,
-      clientId: clientId,
-      caFilePath: caFilePath,
-      topic: topic,
-      s3BucketName: s3BucketName,
-      s3FileKey: s3FileKey,
-      s3Region: s3Region,
-      dynamodbTableName: dynamodbTableName,
-      dynamodbRegion: dynamodbRegion,
-    };
+      destination,
+      localFilePath,
+      mqttsBroker,
+      clientId,
+      caFilePath,
+      topic,
+      s3BucketName,
+      s3FileKey,
+      s3Region,
+      dynamodbTableName,
+      dynamodbRegion
+    }
     try {
-      const connection = new Connection(connectionConfig);
-      connection.startMqtts();
-      return res.status(200).json({ message: 'MQTTS connection started successfully' });
+      const connection = new Connection(connectionConfig)
+      connection.startMqtts()
+      return res.status(200).json({ message: 'MQTTS connection started successfully' })
     } catch (error) {
       // Handle any potential errors here
-      return res.status(400).json({ 'Error on starting MQTTS adapter:': error });
+      return res.status(400).json({ 'Error on starting MQTTS adapter:': error })
     }
   } else if (source === 'http') {
     const connectionConfig = {
-      destination: destination,
-      localFilePath: localFilePath,
+      destination,
+      localFilePath,
       httpPortNumber: parseInt(httpPortNumber, 10),
-      httpRoute: httpRoute,
-      s3BucketName: s3BucketName,
-      s3FileKey: s3FileKey,
-      s3Region: s3Region,
-      dynamodbTableName: dynamodbTableName,
-      dynamodbRegion: dynamodbRegion,
-    };
+      httpRoute,
+      s3BucketName,
+      s3FileKey,
+      s3Region,
+      dynamodbTableName,
+      dynamodbRegion
+    }
     try {
-      const connection = new Connection(connectionConfig);
-      connection.startHttp();
-      return res.status(200).json({ message: 'HTTP connection started successfully' });
+      const connection = new Connection(connectionConfig)
+      connection.startHttp()
+      return res.status(200).json({ message: 'HTTP connection started successfully' })
     } catch (error) {
       // Handle any potential errors here
-      return res.status(400).json({ 'Error on starting HTTP adapter:': error });
+      return res.status(400).json({ 'Error on starting HTTP adapter:': error })
     }
   } else {
-    return res.status(400).json({ error: 'Invalid source. Expected "mqtts" or "http".' });
+    return res.status(400).json({ error: 'Invalid source. Expected "mqtts" or "http".' })
   }
-});
+})
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  console.log(`Server is running on port ${port}`)
+})
