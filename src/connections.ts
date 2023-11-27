@@ -1,9 +1,8 @@
 import MqttsAdapter from './adapters/mqtts.js'
 import HttpAdapter from './adapters/http.js'
-import { LocalMessageSaver } from './utility/message-save-local.js';
-import { extractYearMonthDate } from './utility/extract-year-month-date.js';
-import { FileNameUtility } from './utility/filename-utility.js';
-import { Processors } from './utility/processors.js';
+import Processors from './processors.js';
+import fs from 'fs';
+
 
 
 
@@ -40,7 +39,6 @@ class Connection {
     private dynamodbTableName?: string;
     private dynamodbRegion?: string;
     private currentDate: string | null;
-    private messageSaver: LocalMessageSaver;
     private processors: Processors;
     constructor(config: AdapterConfig) {
         this.destination = config.destination;
@@ -57,8 +55,7 @@ class Connection {
         this.dynamodbTableName = config.dynamodbTableName;
         this.dynamodbRegion = config.dynamodbRegion;
         this.currentDate = null;
-        this.messageSaver = new LocalMessageSaver(this.localFilePath);
-        this.processors = new Processors(this.destination);
+        this.processors = new Processors(this.destination, this.localFilePath);
     }
 
     public startMqtts(){
@@ -79,16 +76,16 @@ class Connection {
         console.log(`This destination: ${this.destination}`);
         console.log(`This local file path: ${this.localFilePath}`);
         const receivedMessage = message.toString();
-        const yearMonthDate = extractYearMonthDate(JSON.parse(receivedMessage).timePublished);
+        const yearMonthDate = this.processors.extractYearMonthDate(JSON.parse(receivedMessage).timePublished);
         console.log(`yearMonthDate: ${yearMonthDate}`);
         if (this.currentDate !== null) {
             if (this.currentDate === yearMonthDate) {
                 console.log(`Before this.messageSaver.saveMessage(receivedMessage);`);
-                this.messageSaver.saveMessage(receivedMessage);
+                this.processors.saveMessage(receivedMessage);
                 console.log(`After this.messageSaver.saveMessage(receivedMessage);`);
             } else {
                 console.log(`this.currentDate !== yearMonthDate`);
-                const oldFileName = FileNameUtility.constructFileName(this.localFilePath, this.currentDate);
+                const oldFileName = this.processors.constructFileName(this.localFilePath, this.currentDate);
                 console.log(`oldFileName: ${oldFileName}`);
                 console.log(`Type: ${typeof this.destination}, Value: ${this.destination}`);
                 console.log(`Type: ${typeof this.s3BucketName}, Value: ${this.s3BucketName}`);
@@ -100,27 +97,29 @@ class Connection {
 
                 if (this.destination === 's3' && this.s3BucketName !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
                     console.log(`Upload to s3 from mqtts`);
-                    this.processors.fromIotToS3(oldFileName, this.s3BucketName, this.s3FileKey, this.s3Region);
+                    const newS3FileKey = this.processors.constructFileName(this.s3FileKey, this.currentDate);
+                    this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region);
                 }
                 if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
                     console.log(`Upload to dynamodb from mqtts`);
                     this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion);
                 }
+
     
-                const newFileName = FileNameUtility.constructFileName(this.localFilePath, yearMonthDate);
-                this.messageSaver.changeFilePath(newFileName);
-                this.messageSaver.createFile(newFileName);
+                const newFileName = this.processors.constructFileName(this.localFilePath, yearMonthDate);
+                this.processors.changeFilePath(newFileName);
+                this.processors.createFile(newFileName);
                 this.currentDate = yearMonthDate;
         
-                this.messageSaver.saveMessage(receivedMessage);
+                this.processors.saveMessage(receivedMessage);
             }
         } else {
             this.currentDate = yearMonthDate;
     
-            const newFileName = FileNameUtility.constructFileName(this.localFilePath, this.currentDate);
-            this.messageSaver.changeFilePath(newFileName);
-            this.messageSaver.createFile(newFileName);
-            this.messageSaver.saveMessage(receivedMessage);
+            const newFileName = this.processors.constructFileName(this.localFilePath, this.currentDate);
+            this.processors.changeFilePath(newFileName);
+            this.processors.createFile(newFileName);
+            this.processors.saveMessage(receivedMessage);
         }
     
 
@@ -142,16 +141,16 @@ class Connection {
         // console.log(`This destination: ${this.destination}`);
         // console.log(`This local file path: ${this.localFilePath}`);
         const receivedMessage = JSON.stringify(message);
-        const yearMonthDate = extractYearMonthDate(JSON.parse(receivedMessage).timePublished);
+        const yearMonthDate = this.processors.extractYearMonthDate(JSON.parse(receivedMessage).timePublished);
         // console.log(`yearMonthDate: ${yearMonthDate}`);
         if (this.currentDate !== null) {
             if (this.currentDate === yearMonthDate) {
                 console.log(`Before this.messageSaver.saveMessage(receivedMessage);`);
-                this.messageSaver.saveMessage(receivedMessage);
+                this.processors.saveMessage(receivedMessage);
                 console.log(`After this.messageSaver.saveMessage(receivedMessage);`);
             } else {
                 console.log(`this.currentDate !== yearMonthDate`);
-                const oldFileName = FileNameUtility.constructFileName(this.localFilePath, this.currentDate);
+                const oldFileName = this.processors.constructFileName(this.localFilePath, this.currentDate);
                 console.log(`oldFileName: ${oldFileName}`);
                 console.log(`Type: ${typeof this.destination}, Value: ${this.destination}`);
                 console.log(`Type: ${typeof this.s3BucketName}, Value: ${this.s3BucketName}`);
@@ -162,27 +161,28 @@ class Connection {
 
                 if (this.destination === 's3' && this.s3BucketName !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
                     console.log(`Upload to s3 from mqtts`);
-                    this.processors.fromIotToS3(oldFileName, this.s3BucketName, this.s3FileKey, this.s3Region);
+                    const newS3FileKey = this.processors.constructFileName(this.s3FileKey, this.currentDate);
+                    this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region);
                 }
                 if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
                     console.log(`Upload to dynamodb from mqtts`);
                     this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion);
                 }
     
-                const newFileName = FileNameUtility.constructFileName(this.localFilePath, yearMonthDate);
-                this.messageSaver.changeFilePath(newFileName);
-                this.messageSaver.createFile(newFileName);
+                const newFileName = this.processors.constructFileName(this.localFilePath, yearMonthDate);
+                this.processors.changeFilePath(newFileName);
+                this.processors.createFile(newFileName);
                 this.currentDate = yearMonthDate;
         
-                this.messageSaver.saveMessage(receivedMessage);
+                this.processors.saveMessage(receivedMessage);
             }
         } else {
             this.currentDate = yearMonthDate;
     
-            const newFileName = FileNameUtility.constructFileName(this.localFilePath, this.currentDate);
-            this.messageSaver.changeFilePath(newFileName);
-            this.messageSaver.createFile(newFileName);
-            this.messageSaver.saveMessage(receivedMessage);
+            const newFileName = this.processors.constructFileName(this.localFilePath, this.currentDate);
+            this.processors.changeFilePath(newFileName);
+            this.processors.createFile(newFileName);
+            this.processors.saveMessage(receivedMessage);
         }
     }
 
