@@ -5,8 +5,25 @@ import { Readable } from 'stream';
  * S3Uploader is a class for uploading objects to an Amazon S3 bucket.
  */
 export class S3Uploader {
+  /**
+   * Amazon S3 client instance.
+   * @type {S3Client}
+   * @private
+   */
   private readonly s3: S3Client;
+
+  /**
+   * Name of the Amazon S3 bucket.
+   * @type {string}
+   * @private
+   */
   private readonly bucketName: string;
+
+  /**
+   * Key to identify the uploaded object within the bucket.
+   * @type {string}
+   * @private
+   */
   private readonly fileKey: string;
 
   /**
@@ -17,25 +34,8 @@ export class S3Uploader {
    * @param {string} region - The AWS region where the S3 bucket is located.
    */
   constructor(bucketName: string, fileKey: string, region: string) {
-    /**
-     * Amazon S3 client instance.
-     * @type {S3Client}
-     * @private
-     */
     this.s3 = new S3Client({ region });
-
-    /**
-     * Name of the Amazon S3 bucket.
-     * @type {string}
-     * @private
-     */
     this.bucketName = bucketName;
-
-    /**
-     * Key to identify the uploaded object within the bucket.
-     * @type {string}
-     * @private
-     */
     this.fileKey = fileKey;
   }
 
@@ -61,9 +61,9 @@ export class S3Uploader {
 
     try {
       await this.s3.send(command);
-      // console.log(`Object uploaded to S3: s3://${this.bucketName}/${this.fileKey}`);
+      // Uncomment the following line for logging: console.log(`Object uploaded to S3: s3://${this.bucketName}/${this.fileKey}`);
     } catch (error) {
-      // console.error(`Error uploading object to S3: ${error.message}`);
+      // Uncomment the following line for logging: console.error(`Error uploading object to S3: ${error.message}`);
       throw error;
     }
   }
