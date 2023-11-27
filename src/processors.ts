@@ -1,63 +1,76 @@
-import fs, { writeFile, existsSync, appendFile } from 'fs'
-import { S3Uploader } from './adapters/s3.js'
-import { DynamoDBUploader } from './adapters/dynamodb.js'
+import fs, { writeFile, existsSync, appendFile } from 'fs';
+import { S3Uploader } from './adapters/s3.js';
+import { DynamoDBUploader } from './adapters/dynamodb.js';
 
 /**
  * Represents a handler for transferring data based on source and destination.
  */
 class Processors {
-  private readonly destination: string
-  private localSavePath: string
+  private readonly destination: string;
+  private localSavePath: string;
 
   /**
    * Creates an instance of Processors.
    * @param {string} destination - The destination service.
    * @param {string} localSavePath - The local path to save files.
    */
-  constructor (destination: string, localSavePath: string) {
-    this.destination = destination
-    this.localSavePath = localSavePath
+  constructor(destination: string, localSavePath: string) {
+    this.destination = destination;
+    this.localSavePath = localSavePath;
   }
 
   /**
    * Changes the local file path.
    * @param {string} newFilePath - The new local file path.
    */
-  public changeFilePath (newFilePath: string): void {
-    this.localSavePath = newFilePath
+  public changeFilePath(newFilePath: string): void {
+    this.localSavePath = newFilePath;
   }
 
   /**
    * Saves a message to the local file.
    * @param {string} message - The message to be saved.
    */
-  public saveMessage (message: string): void {
-    if (existsSync(this.localSavePath)) {
-      appendFile(this.localSavePath, message + '\n', (err) => {
-        if (err !== null && err !== undefined) {
-          console.error('Error appending message to file:', err)
-        }
-      })
-    } else {
-      writeFile(this.localSavePath, message + '\n', (err) => {
-        if (err !== null && err !== undefined) {
-          console.error('Error creating and writing to file:', err)
-        }
-      })
-    }
+  public async saveMessage(message: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (existsSync(this.localSavePath)) {
+        appendFile(this.localSavePath, message + '\n', (err) => {
+          if (err) {
+            console.error('Error appending message to file:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        writeFile(this.localSavePath, message + '\n', (err) => {
+          if (err) {
+            console.error('Error creating and writing to file:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
   }
 
   /**
    * Creates a new file at the specified path.
    * @param {string} newFilePath - The path of the new file to create.
    */
-  public createFile (newFilePath: string): void {
-    writeFile(newFilePath, '', (err) => {
-      if (err !== null && err !== undefined) {
-        console.error('Error creating a new file:', err)
-      }
-      console.log('newFilePath created successfully.')
-    })
+  public async createFile(newFilePath: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      writeFile(newFilePath, '', (err) => {
+        if (err) {
+          console.error('Error creating a new file:', err);
+          reject(err);
+        } else {
+          console.log('newFilePath created successfully.');
+          resolve();
+        }
+      });
+    });
   }
 
   /**
@@ -73,18 +86,18 @@ class Processors {
    * console.log(result); // Output: '2023-11-09'
    * ```
    */
-  public extractYearMonthDate (timePublished: string): string {
-    const date = new Date(timePublished)
+  public extractYearMonthDate(timePublished: string): string {
+    const date = new Date(timePublished);
 
     if (isNaN(date.getTime())) {
-      throw new Error('Invalid timestamp format. Please provide a valid ISO string.')
+      throw new Error('Invalid timestamp format. Please provide a valid ISO string.');
     }
 
-    const year = date.getFullYear()
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
 
-    return `${year}-${month}-${day}`
+    return `${year}-${month}-${day}`;
   }
 
   /**
@@ -93,22 +106,22 @@ class Processors {
    * @param {string} publishedDate - The date to append to the file name.
    * @returns {string} The updated file path with the published date.
    */
-  public constructFileName (pathFile: string, publishedDate: string): string {
-    const pathSegments = pathFile.split('/')
-    const fileName = pathSegments.pop()
+  public constructFileName(pathFile: string, publishedDate: string): string {
+    const pathSegments = pathFile.split('/');
+    const fileName = pathSegments.pop();
 
     if (typeof fileName === 'string') {
-      const parts = fileName.split('.')
+      const parts = fileName.split('.');
 
       if (parts.length === 1) {
-        return pathFile + '_' + publishedDate
+        return pathFile + '_' + publishedDate;
       } else {
-        const extension = parts.pop()
-        const name = parts.join('.')
-        return pathSegments.join('/') + '/' + name + '_' + publishedDate + '.' + extension
+        const extension = parts.pop();
+        const name = parts.join('.');
+        return pathSegments.join('/') + '/' + name + '_' + publishedDate + '.' + extension;
       }
     } else {
-      return pathFile + '_' + publishedDate
+      return pathFile + '_' + publishedDate;
     }
   }
 
@@ -120,19 +133,20 @@ class Processors {
    * @param {string} s3Region - The AWS region.
    * @throws {Error} If the source-destination combination is unsupported.
    */
-  async fromIotToS3 (localFilePath: string, s3Bucket: string, s3FileKey: string, s3Region: string): Promise<void> {
+  public async fromIotToS3(localFilePath: string, s3Bucket: string, s3FileKey: string, s3Region: string): Promise<void> {
     if (this.destination === 's3') {
-      const s3Uploader = new S3Uploader(s3Bucket, s3FileKey, s3Region)
-      const fileStream = fs.createReadStream(localFilePath)
+      const s3Uploader = new S3Uploader(s3Bucket, s3FileKey, s3Region);
+      const fileStream = fs.createReadStream(localFilePath);
 
       try {
-        await s3Uploader.uploadObject(fileStream)
-        fs.unlinkSync(localFilePath) // After successful upload, delete the local file
+        await s3Uploader.uploadObject(fileStream);
+        fs.unlinkSync(localFilePath); // After successful upload, delete the local file
       } catch (error) {
-        console.error('Error during upload:', error)
+        console.error('Error during upload:', error);
+        throw error;
       }
     } else {
-      throw new Error('Failed to upload to s3')
+      throw new Error('Failed to upload to s3');
     }
   }
 
@@ -143,20 +157,21 @@ class Processors {
    * @param {string} dynamoDBRegion - The DynamoDB region.
    * @throws {Error} If the source-destination combination is unsupported.
    */
-  async fromIotToDynamoDB (localFilePath: string, tableName: string, dynamoDBRegion: string): Promise<void> {
+  public async fromIotToDynamoDB(localFilePath: string, tableName: string, dynamoDBRegion: string): Promise<void> {
     if (this.destination === 'dynamodb') {
-      const dynamoDBUploader = new DynamoDBUploader(localFilePath, tableName, dynamoDBRegion)
-      console.log('Uploading to DynamoDB in Processors.ts')
+      const dynamoDBUploader = new DynamoDBUploader(localFilePath, tableName, dynamoDBRegion);
+      console.log('Uploading to DynamoDB in Processors.ts');
       try {
-        await dynamoDBUploader.uploadToDynamoDB()
-        fs.unlinkSync(localFilePath) // After successful upload, delete the local file
+        await dynamoDBUploader.uploadToDynamoDB();
+        fs.unlinkSync(localFilePath); // After successful upload, delete the local file
       } catch (error) {
-        console.error('Error during upload:', error)
+        console.error('Error during upload:', error);
+        throw error;
       }
     } else {
-      throw new Error('Failed to upload to DynamoDB')
+      throw new Error('Failed to upload to DynamoDB');
     }
   }
 }
 
-export default Processors
+export default Processors;
