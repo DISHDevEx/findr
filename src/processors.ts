@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { writeFile, existsSync, appendFile } from 'fs';
-import { S3Uploader } from './s3.js';
-import { DynamoDBUploader } from './dynamodb.js';
+import { S3Uploader } from './adapters/s3.js';
+import { DynamoDBUploader } from './adapters/dynamodb.js';
 
 /**
  * Represents a handler for transferring data based on source and destination.
