@@ -58,13 +58,6 @@ export class S3Uploader {
     }
 
     const command = new PutObjectCommand(params)
-
-    try {
-      await this.s3.send(command)
-      // Uncomment the following line for logging: console.log(`Object uploaded to S3: s3://${this.bucketName}/${this.fileKey}`);
-    } catch (error) {
-      // Uncomment the following line for logging: console.error(`Error uploading object to S3: ${error.message}`);
-      throw error
-    }
+    await this.s3.send(command)
   }
 }
