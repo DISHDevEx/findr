@@ -9,7 +9,24 @@ app.use(cors()); // Enable CORS for all routes
 
 app.use(express.json()); // Middleware to parse JSON request body
 
-// Define the endpoint to trigger the adapters
+/**
+ * Defines the endpoint to trigger the adapters based on the provided configuration.
+ *
+ * @param {string} source - The source of the data (e.g., 'mqtts' or 'http').
+ * @param {string} destination - The destination service (e.g., 's3' or 'dynamodb').
+ * @param {string} localFilePath - The local file path for saving messages.
+ * @param {string} mqttsBroker - The MQTT broker address (applicable for 'mqtts' source).
+ * @param {string} topic - The MQTT topic to subscribe to (applicable for 'mqtts' source).
+ * @param {string} clientId - The MQTT client ID (applicable for 'mqtts' source).
+ * @param {string} caFilePath - The file path of the Certificate Authority file (applicable for 'mqtts' source).
+ * @param {number} httpPortNumber - The HTTP server port number (applicable for 'http' source).
+ * @param {string} httpRoute - The HTTP route to trigger (applicable for 'http' source).
+ * @param {string} s3BucketName - The S3 bucket name for storage.
+ * @param {string} s3FileKey - The S3 file key for storage.
+ * @param {string} s3Region - The AWS region for S3.
+ * @param {string} dynamodbTableName - The DynamoDB table name for storage.
+ * @param {string} dynamodbRegion - The AWS region for DynamoDB.
+ */
 app.post('/trigger-adapters', (req: Request, res: Response) => {
   // Extract parameters from the request body
   const {

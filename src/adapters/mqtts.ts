@@ -1,42 +1,79 @@
-import { connect, IClientOptions } from 'mqtt';
-import { MqttClient } from 'mqtt';
+import { connect, IClientOptions, MqttClient } from 'mqtt';
 import { readFileSync } from 'fs';
 
-
+/**
+ * MqttsAdapter is a class for interacting with an MQTT broker using MQTT over TLS (mqtts).
+ */
 class MqttsAdapter {
+  /**
+   * MQTT broker address.
+   * @type {string}
+   * @private
+   */
   private mqttsBroker: string;
-  private client: MqttClient;
-  // private protocol: MqttProtocol;
-  private clientId: string;
-  private caFilePath: string;
-  private topic: string;
-  private receiveMqttsMessage: (receivedTopic: string, message: object) => void;
-
 
   /**
-   * Creates an instance of MqttAdapter.
-   * @param mqttsBroker - MQTT broker address.
-  //  * @param protocol - MQTT protocol.
-   * @param clientId - MQTT client ID.
-   * @param caFilePath - Path to the CA file.
-   * @param topic - MQTT topic.
+   * MQTT client instance.
+   * @type {MqttClient}
+   * @private
+   */
+  private client: MqttClient;
+
+  /**
+   * MQTT client ID.
+   * @type {string}
+   * @private
+   */
+  private clientId: string;
+
+  /**
+   * Path to the Certificate Authority (CA) file for secure communication.
+   * @type {string}
+   * @private
+   */
+  private caFilePath: string;
+
+  /**
+   * MQTT topic to subscribe to.
+   * @type {string}
+   * @private
+   */
+  private topic: string;
+
+  /**
+   * Callback function to process received MQTT messages.
+   * @type {(receivedTopic: string, message: object) => void}
+   * @private
+   */
+  private receiveMqttsMessage: (receivedTopic: string, message: object) => void;
+
+  /**
+   * Creates an instance of MqttsAdapter.
+   *
+   * @param {string} mqttsBroker - MQTT broker address.
+   * @param {string} clientId - MQTT client ID.
+   * @param {string} caFilePath - Path to the CA file.
+   * @param {string} topic - MQTT topic.
+   * @param {(receivedTopic: string, message: object) => void} receiveMqttsMessage - Callback function to process received MQTT messages.
    */
   constructor(
     mqttsBroker: string,
-    // protocol: MqttProtocol,
     clientId: string,
     caFilePath: string,
     topic: string,
     receiveMqttsMessage: (receivedTopic: string, message: object) => void,
   ) {
     this.mqttsBroker = mqttsBroker;
-    // this.protocol = protocol;
     this.clientId = clientId;
     this.caFilePath = caFilePath;
     this.topic = topic;
     this.receiveMqttsMessage = receiveMqttsMessage;
   }
 
+  /**
+   * Connects the MQTT client to the broker.
+   * @private
+   */
   private connectClient(): void {
     const options: IClientOptions = {
       clientId: this.clientId,
@@ -44,11 +81,11 @@ class MqttsAdapter {
       rejectUnauthorized: false,
     };
 
-    console.log('try to::: create client in new-mqtts.ts');
+    console.log('Attempting to create a client in MqttsAdapter.ts');
     this.client = connect(this.mqttsBroker, options);
-    console.log('complete::: create client in new-mqtts.ts');
+    console.log('Client created in MqttsAdapter.ts');
 
-    console.log('try to ::: Connected to MQTT broker in new-mqtts.ts');
+    console.log('Attempting to connect to MQTT broker in MqttsAdapter.ts');
     this.client.on('connect', () => {
       console.log('Connected to MQTT broker');
       this.subscribeToTopic(this.topic);
@@ -59,15 +96,19 @@ class MqttsAdapter {
     });
   }
 
+  /**
+   * Starts the MQTT client.
+   */
   public startClient(): void {
-    console.log('try to::: connectClient() in new-mqtts.ts');
+    console.log('Attempting to connectClient() in MqttsAdapter.ts');
     this.connectClient();
-    console.log('complete::: connectClient() in new-mqtts.ts');
+    console.log('connectClient() complete in MqttsAdapter.ts');
   }
 
   /**
    * Subscribes to the specified MQTT topic.
-   * @param topic - The MQTT topic to subscribe to.
+   * @param {string} topic - The MQTT topic to subscribe to.
+   * @private
    */
   private subscribeToTopic(topic: string): void {
     this.client.subscribe(topic, (err) => {
@@ -80,4 +121,4 @@ class MqttsAdapter {
   }
 }
 
-export default MqttsAdapter
+export default MqttsAdapter;
