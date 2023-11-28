@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express'
 import cors from 'cors'
-import Connection from './connection.js'
+import Connection from './connections.js'
 
 const app = express()
 // Ensure the value is not null or undefined before using it

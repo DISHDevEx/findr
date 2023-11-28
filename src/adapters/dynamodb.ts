@@ -6,6 +6,13 @@ import { DynamoDBClient, PutItemCommand, type PutItemOutput , type PutItemComman
  */
 export class DynamoDBUploader {
   /**
+   * File path containing data to be uploaded.
+   * @type {string}
+   * @private
+   */
+  private readonly filePath: string
+
+  /**
    * Amazon DynamoDB client instance.
    * @type {DynamoDBClient}
    * @private
@@ -20,22 +27,15 @@ export class DynamoDBUploader {
   private readonly tableName: string
 
   /**
-   * File path containing data to be uploaded.
-   * @type {string}
-   * @private
-   */
-  private readonly filePath: string
-
-  /**
    * Constructs a DynamoDBUploader instance.
    *
-   * @param {string} tableName - The name of the DynamoDB table.
    * @param {string} filePath - The file path containing data to be uploaded.
+   * @param {string} tableName - The name of the DynamoDB table.
    * @param {string} region - The AWS region where the DynamoDB table is located.
    */
-  constructor (tableName: string, filePath: string, region: string) {
-    this.tableName = tableName
+  constructor (filePath: string, tableName: string, region: string) {
     this.filePath = filePath
+    this.tableName = tableName
     this.dynamoDBClient = new DynamoDBClient({ region })
   }
 
