@@ -1,9 +1,12 @@
-import MqttsAdapter from './mqtts'
-import HttpAdapter from './http'
-import Processors from './processors'
-/** * Configuration options for creating a Connection instance.
- */interface AdapterConfig {
-  destination: string  
+import MqttsAdapter from './adapters/mqtts.js'
+import HttpAdapter from './adapters/http.js'
+import Processors from './processors.js'
+
+/**
+ * Configuration options for creating a Connection instance.
+ */
+interface AdapterConfig {
+  destination: string
   localFilePath: string
   mqttsBroker?: string
   clientId?: string
@@ -37,6 +40,8 @@ class Connection {
   private readonly dynamodbRegion?: string
   private currentDate: string | null
   private readonly processors: Processors
+  // private mqttsAdapter?: MqttsAdapter
+  // private httpAdapter?: HttpAdapter
 
   /**
    * Creates an instance of Connection.
@@ -70,9 +75,16 @@ class Connection {
     const topic = this.topic ?? ''
     const mqttsAdapter = new MqttsAdapter(mqttsBroker, clientId, caFilePath, topic, this.receiveMqttsMessage.bind(this))
     console.log('Attempting to start MqttsAdapter in Connection.ts')
-    await mqttsAdapter.startClient()
+    await mqttsAdapter.startClient().catch(() => {})
     console.log('MqttsAdapter started successfully in Connection.ts')
   }
+
+  // /**
+  //  * Stops the MqttsAdapter client.
+  //  */
+  // public async stopMqtts(): Promise<void> {
+  //   await this.mqttsAdapter?.stopClient()
+  // }
 
   /**
    * Handles received MQTT messages.
@@ -89,7 +101,7 @@ class Connection {
     if (this.currentDate !== null) {
       if (this.currentDate === yearMonthDate) {
         console.log('Before this.processors.saveMessage(receivedMessage);')
-        this.processors.saveMessage(receivedMessage)
+        await this.processors.saveMessage(receivedMessage).catch(() => {})
         console.log('After this.processors.saveMessage(receivedMessage);')
       } else {
         console.log('this.currentDate !== yearMonthDate')
@@ -105,28 +117,29 @@ class Connection {
         if (this.destination === 's3' && this.s3BucketName !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
           console.log('Upload to s3 from mqtts')
           const newS3FileKey = this.processors.constructFileName(this.s3FileKey, this.currentDate)
-          await this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region)
+          await this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region).catch(() => {})
         }
         if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
           console.log('Upload to dynamodb from mqtts')
-          await this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion)
+          await this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion).catch(() => {})
         }
 
         const newFileName = this.processors.constructFileName(this.localFilePath, yearMonthDate)
         this.processors.changeFilePath(newFileName)
-        this.processors.createFile(newFileName)
+        await this.processors.createFile(newFileName).catch(() => {})
         this.currentDate = yearMonthDate
 
-        this.processors.saveMessage(receivedMessage)
+        await this.processors.saveMessage(receivedMessage).catch(() => {})
       }
     } else {
       this.currentDate = yearMonthDate
 
       const newFileName = this.processors.constructFileName(this.localFilePath, this.currentDate)
       this.processors.changeFilePath(newFileName)
-      this.processors.createFile(newFileName)
-      this.processors.saveMessage(receivedMessage)
+      await this.processors.createFile(newFileName).catch(() => {})
+      await this.processors.saveMessage(receivedMessage).catch(() => {})
     }
+    console.log('receiveMqttsMessage complete.')
   }
 
   /**
@@ -137,9 +150,16 @@ class Connection {
     const httpRoute = this.httpRoute ?? ''
     const httpAdapter = new HttpAdapter(httpPortNumber, httpRoute, this.receiveHttpMessage.bind(this))
     console.log('Attempting to start HttpAdapter in Connection.ts')
-    await httpAdapter.startServer()
+    await httpAdapter.startServer().catch(() => {})
     console.log('HttpAdapter started successfully in Connection.ts')
   }
+
+  // /**
+  //  * Stops the HttpAdapter server.
+  //  */
+  // public async stopHttp(): Promise<void> {
+  //   await this.httpAdapter?.stopHttpServer()
+  // }
 
   /**
    * Handles received HTTP messages.
@@ -155,7 +175,7 @@ class Connection {
     if (this.currentDate !== null) {
       if (this.currentDate === yearMonthDate) {
         console.log('Before this.processors.saveMessage(receivedMessage);')
-        this.processors.saveMessage(receivedMessage)
+        await this.processors.saveMessage(receivedMessage).catch(() => {})
         console.log('After this.processors.saveMessage(receivedMessage);')
       } else {
         console.log('this.currentDate !== yearMonthDate')
@@ -171,28 +191,29 @@ class Connection {
         if (this.destination === 's3' && this.s3BucketName !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
           console.log('Upload to s3 from mqtts')
           const newS3FileKey = this.processors.constructFileName(this.s3FileKey, this.currentDate)
-          await this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region)
+          await this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region).catch(() => {})
         }
         if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
           console.log('Upload to dynamodb from mqtts')
-          await this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion)
+          await this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion).catch(() => {})
         }
 
         const newFileName = this.processors.constructFileName(this.localFilePath, yearMonthDate)
         this.processors.changeFilePath(newFileName)
-        this.processors.createFile(newFileName)
+        await this.processors.createFile(newFileName).catch(() => {})
         this.currentDate = yearMonthDate
 
-        this.processors.saveMessage(receivedMessage)
+        await this.processors.saveMessage(receivedMessage).catch(() => {})
       }
     } else {
       this.currentDate = yearMonthDate
 
       const newFileName = this.processors.constructFileName(this.localFilePath, this.currentDate)
       this.processors.changeFilePath(newFileName)
-      this.processors.createFile(newFileName)
-      this.processors.saveMessage(receivedMessage)
+      await this.processors.createFile(newFileName).catch(() => {})
+      await this.processors.saveMessage(receivedMessage).catch(() => {})
     }
+    console.log('receiveHttpMessage complete.')
   }
 }
 

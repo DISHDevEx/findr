@@ -74,24 +74,31 @@ class MqttsAdapter {
    * Connects the MQTT client to the broker.
    * @private
    */
-  private connectClient (): void {
-    const options: IClientOptions = {
-      clientId: this.clientId,
-      ca: [readFileSync(this.caFilePath)],
-      rejectUnauthorized: false
-    }
+  private async connectClient (): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      const options: IClientOptions = {
+        clientId: this.clientId,
+        ca: [readFileSync(this.caFilePath)],
+        rejectUnauthorized: false
+      }
 
-    console.log('Attempting to create a client in MqttsAdapter.ts')
-    this.client = connect(this.mqttsBroker, options)
-    console.log('Client created in MqttsAdapter.ts')
+      console.log('Attempting to create a client in MqttsAdapter.ts')
+      this.client = connect(this.mqttsBroker, options)
 
-    console.log('Attempting to connect to MQTT broker in MqttsAdapter.ts')
-    this.client.on('connect', () => {
-      console.log('Connected to MQTT broker')
-      this.subscribeToTopic(this.topic)
+      this.client.on('error', (error) => {
+        console.error('Error connecting to MQTT broker:', error)
+        reject(error)
+      })
 
-      this.client.on('message', (receivedTopic, message) => {
-        this.receiveMqttsMessage(receivedTopic, message)
+      this.client.on('connect', () => {
+        console.log('Connected to MQTT broker')
+        this.subscribeToTopic(this.topic)
+
+        this.client.on('message', (receivedTopic, message) => {
+          this.receiveMqttsMessage(receivedTopic, message)
+        })
+
+        resolve()
       })
     })
   }
@@ -99,9 +106,9 @@ class MqttsAdapter {
   /**
    * Starts the MQTT client.
    */
-  public startClient (): void {
+  public async startClient (): Promise<void> {
     console.log('Attempting to connectClient() in MqttsAdapter.ts')
-    this.connectClient()
+    await this.connectClient()
     console.log('connectClient() complete in MqttsAdapter.ts')
   }
 
@@ -115,10 +122,23 @@ class MqttsAdapter {
       if (err === null) {
         console.log(`Subscriber subscribed to ${this.topic} topic`)
       } else {
-        console.error(`Error subscribing to ${this.topic} topic: ${err}`)
+        console.error(`Error subscribing to ${this.topic} topic: ${err.toString()}`)
       }
     })
   }
+
+  // /**
+  //  * Stops the MQTT client.
+  //  */
+  // public async stopClient(): Promise<void> {
+  //   this.client.end((err) => {
+  //     if (err !== null && err !== undefined) {
+  //       console.error('Error stopping MQTT client:', err)
+  //     } else {
+  //       console.log('MQTT client stopped successfully')
+  //     }
+  //   })
+  // }
 }
 
 export default MqttsAdapter
