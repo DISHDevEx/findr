@@ -9,7 +9,7 @@ COPY package*.json tsconfig.json ./
 
 # Install dependencies
 RUN apk add --no-cache python3 \
-    && ln -s /usr/bin/python3 /usr/bin/python \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
     && npm install
 
 # Copy the source code to the working directory
@@ -19,7 +19,7 @@ COPY src ./src
 RUN npm run compile
 
 # Expose the default port
-EXPOSE 8081
+EXPOSE 8082
 
 # CMD instruction dynamically sets the port based on the adapter type
 CMD ["sh", "-c", "npm run adapters -- --port $(if [ \"$ADAPTER_TYPE\" = \"http\" ]; then echo 3000; else echo 8883; fi)"]
