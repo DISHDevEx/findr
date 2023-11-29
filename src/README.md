@@ -9,6 +9,10 @@ In the repo's root directory, run the following command to start the Findr liste
 ```console
 node dist/adapters.ts
 ```
+or
+```console
+npm run adapters
+```
 ## repo structure:
 ```
 findr/
