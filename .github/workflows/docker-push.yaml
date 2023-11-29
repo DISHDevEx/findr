@@ -36,4 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_adapters
           push: true
-          tags: findr/iot:adapters
+          tags: taasmss/findr:adapters
