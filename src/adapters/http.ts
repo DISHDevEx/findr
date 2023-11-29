@@ -35,7 +35,7 @@ class HttpAdapter {
 
   /**
    * Constructs an HttpAdapter instance.
-   *
+   * 
    * @param {number} httpPortNumber - The port number on which the HTTP server will listen.
    * @param {string} httpRoute - The route for receiving HTTP messages.
    * @param {(message: object) => void} receiveHttpMessage - Callback function to process received HTTP messages.
