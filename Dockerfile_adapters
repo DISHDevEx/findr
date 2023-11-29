@@ -28,4 +28,4 @@ EXPOSE 8080
 
 # CMD instruction dynamically sets the port based on the adapter type
 # CMD ["sh", "-c", "npm run adapters -- --port $(if [ \"$ADAPTER_TYPE\" = \"http\" ]; then echo 3000; else echo 8883; fi)"]
-# CMD ["node", "./dist/adapters.js"]
+CMD ["node", "./dist/adapters.js"]
