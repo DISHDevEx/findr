@@ -35,14 +35,46 @@ const {
   DYNAMODB_REGION,
 } = process.env;
 
-// Provide default values or fallbacks
+// Assign default values using nullish coalescing operator
 const source = SOURCE ?? '';
 const destination = DESTINATION ?? '';
 const localFilePath = LOCAL_FILE_PATH ?? '';
 const mqttsBroker = MQTTS_BROKER ?? '';
 const topic = TOPIC ?? '';
+const clientId = CLIENT_ID ?? '';
+const caFilePath = CA_FILE_PATH ?? '';
+const httpPortNumber = HTTP_PORT_NUMBER ?? '';
+const httpRoute = HTTP_ROUTE ?? '';
+const s3BucketName = S3_BUCKET_NAME ?? '';
+const s3FileKey = S3_FILE_KEY ?? '';
+const s3Region = S3_REGION ?? '';
+const dynamodbTableName = DYNAMODB_TABLE_NAME ?? '';
+const dynamodbRegion = DYNAMODB_REGION ?? '';
 
-// Check if SOURCE and DESTINATION are defined
+// Check if any of the mandatory parameters are empty strings
+const mandatoryParameters = [
+  source,
+  destination,
+  localFilePath,
+  mqttsBroker,
+  topic,
+  clientId,
+  caFilePath,
+  httpPortNumber,
+  httpRoute,
+  s3BucketName,
+  s3FileKey,
+  s3Region,
+  dynamodbTableName,
+  dynamodbRegion,
+];
+
+if (mandatoryParameters.some(param => param === '')) {
+  console.error('One or more mandatory parameters are empty strings.');
+  process.exit(1);
+}
+
+// Your existing logic to start adapters based on parameters
 if (source === '' || destination === '') {
   console.error('SOURCE and DESTINATION are mandatory parameters.');
   process.exit(1);
@@ -54,14 +86,14 @@ if (source === 'mqtts') {
     destination,
     localFilePath,
     mqttsBroker,
-    clientId: CLIENT_ID,
-    caFilePath: CA_FILE_PATH,
+    clientId,
+    caFilePath,
     topic,
-    s3BucketName: S3_BUCKET_NAME,
-    s3FileKey: S3_FILE_KEY,
-    s3Region: S3_REGION,
-    dynamodbTableName: DYNAMODB_TABLE_NAME,
-    dynamodbRegion: DYNAMODB_REGION,
+    s3BucketName,
+    s3FileKey,
+    s3Region,
+    dynamodbTableName,
+    dynamodbRegion,
   };
 
   try {
@@ -77,13 +109,13 @@ if (source === 'mqtts') {
   const connectionConfig = {
     destination,
     localFilePath,
-    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
-    httpRoute: HTTP_ROUTE,
-    s3BucketName: S3_BUCKET_NAME,
-    s3FileKey: S3_FILE_KEY,
-    s3Region: S3_REGION,
-    dynamodbTableName: DYNAMODB_TABLE_NAME,
-    dynamodbRegion: DYNAMODB_REGION,
+    httpPortNumber: parseInt(httpPortNumber, 10),
+    httpRoute,
+    s3BucketName,
+    s3FileKey,
+    s3Region,
+    dynamodbTableName,
+    dynamodbRegion,
   };
 
   try {
