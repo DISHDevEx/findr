@@ -1,4 +1,4 @@
-import Connection from './connections.js'
+import Connection from './connections.js';
 
 /**
  * Defines the endpoint to trigger the adapters based on the provided configuration.
@@ -35,15 +35,15 @@ const {
   DYNAMODB_REGION,
 } = process.env;
 
+// Provide default values or fallbacks
 const source = SOURCE ?? '';
 const destination = DESTINATION ?? '';
 const localFilePath = LOCAL_FILE_PATH ?? '';
 const mqttsBroker = MQTTS_BROKER ?? '';
 const topic = TOPIC ?? '';
 
-
 // Check if SOURCE and DESTINATION are defined
-if (source === 'undefined' || destination === 'undefined') {
+if (source === '' || destination === '') {
   console.error('SOURCE and DESTINATION are mandatory parameters.');
   process.exit(1);
 }
