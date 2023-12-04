@@ -1,14 +1,4 @@
-import express, { type Request, type Response } from 'express'
-import cors from 'cors'
 import Connection from './connections.js'
-
-const app = express()
-// Ensure the value is not null or undefined before using it
-const port = parseInt(process.env.API_PORT ?? '8080', 10)
-
-app.use(cors()) // Enable CORS for all routes
-
-app.use(express.json()) // Middleware to parse JSON request body
 
 /**
  * Defines the endpoint to trigger the adapters based on the provided configuration.
@@ -28,79 +18,77 @@ app.use(express.json()) // Middleware to parse JSON request body
  * @param {string} dynamodbTableName - The DynamoDB table name for storage.
  * @param {string} dynamodbRegion - The AWS region for DynamoDB.
  */
-app.post('/trigger-adapters', (req: Request, res: Response) => {
-  // Extract parameters from the request body
-  const {
-    source,
-    destination,
-    localFilePath,
-    mqttsBroker,
-    topic,
-    clientId,
-    caFilePath,
-    httpPortNumber,
-    httpRoute,
-    s3BucketName,
-    s3FileKey,
-    s3Region,
-    dynamodbTableName,
-    dynamodbRegion
-  } = req.body
+const {
+  SOURCE,
+  DESTINATION,
+  LOCAL_FILE_PATH,
+  MQTTS_BROKER,
+  TOPIC,
+  CLIENT_ID,
+  CA_FILE_PATH,
+  HTTP_PORT_NUMBER,
+  HTTP_ROUTE,
+  S3_BUCKET_NAME,
+  S3_FILE_KEY,
+  S3_REGION,
+  DYNAMODB_TABLE_NAME,
+  DYNAMODB_REGION,
+} = process.env;
 
-  // Check if SOURCE and DESTINATION are defined
-  if (source === undefined || destination === undefined) {
-    return res.status(400).json({ error: 'SOURCE and DESTINATION are mandatory parameters.' })
+// Check if SOURCE and DESTINATION are defined
+if (SOURCE === undefined || DESTINATION === undefined) {
+  console.error('SOURCE and DESTINATION are mandatory parameters.');
+  process.exit(1);
+}
+
+// Your existing logic to start adapters based on parameters
+if (SOURCE === 'mqtts') {
+  const connectionConfig = {
+    destination: DESTINATION,
+    localFilePath: LOCAL_FILE_PATH,
+    mqttsBroker: MQTTS_BROKER,
+    clientId: CLIENT_ID,
+    caFilePath: CA_FILE_PATH,
+    topic: TOPIC,
+    s3BucketName: S3_BUCKET_NAME,
+    s3FileKey: S3_FILE_KEY,
+    s3Region: S3_REGION,
+    dynamodbTableName: DYNAMODB_TABLE_NAME,
+    dynamodbRegion: DYNAMODB_REGION,
+  };
+
+  try {
+    const connection = new Connection(connectionConfig);
+    connection.startMqtts();
+    console.log('MQTTS connection started successfully');
+  } catch (error) {
+    // Handle any potential errors here
+    console.error('Error on starting MQTTS adapter:', error);
+    process.exit(1);
   }
+} else if (SOURCE === 'http') {
+  const connectionConfig = {
+    destination: DESTINATION,
+    localFilePath: LOCAL_FILE_PATH,
+    httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
+    httpRoute: HTTP_ROUTE,
+    s3BucketName: S3_BUCKET_NAME,
+    s3FileKey: S3_FILE_KEY,
+    s3Region: S3_REGION,
+    dynamodbTableName: DYNAMODB_TABLE_NAME,
+    dynamodbRegion: DYNAMODB_REGION,
+  };
 
-  // Your existing logic to start adapters based on parameters
-  if (source === 'mqtts') {
-    const connectionConfig = {
-      destination,
-      localFilePath,
-      mqttsBroker,
-      clientId,
-      caFilePath,
-      topic,
-      s3BucketName,
-      s3FileKey,
-      s3Region,
-      dynamodbTableName,
-      dynamodbRegion
-    }
-    try {
-      const connection = new Connection(connectionConfig)
-      connection.startMqtts()
-      return res.status(200).json({ message: 'MQTTS connection started successfully' })
-    } catch (error) {
-      // Handle any potential errors here
-      return res.status(400).json({ 'Error on starting MQTTS adapter:': error })
-    }
-  } else if (source === 'http') {
-    const connectionConfig = {
-      destination,
-      localFilePath,
-      httpPortNumber: parseInt(httpPortNumber, 10),
-      httpRoute,
-      s3BucketName,
-      s3FileKey,
-      s3Region,
-      dynamodbTableName,
-      dynamodbRegion
-    }
-    try {
-      const connection = new Connection(connectionConfig)
-      connection.startHttp()
-      return res.status(200).json({ message: 'HTTP connection started successfully' })
-    } catch (error) {
-      // Handle any potential errors here
-      return res.status(400).json({ 'Error on starting HTTP adapter:': error })
-    }
-  } else {
-    return res.status(400).json({ error: 'Invalid source. Expected "mqtts" or "http".' })
+  try {
+    const connection = new Connection(connectionConfig);
+    connection.startHttp();
+    console.log('HTTP connection started successfully');
+  } catch (error) {
+    // Handle any potential errors here
+    console.error('Error on starting HTTP adapter:', error);
+    process.exit(1);
   }
-})
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
-})
+} else {
+  console.error('Invalid source. Expected "mqtts" or "http".');
+  process.exit(1);
+}
