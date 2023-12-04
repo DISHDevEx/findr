@@ -35,21 +35,28 @@ const {
   DYNAMODB_REGION,
 } = process.env;
 
+const source = SOURCE ?? '';
+const destination = DESTINATION ?? '';
+const localFilePath = LOCAL_FILE_PATH ?? '';
+const mqttsBroker = MQTTS_BROKER ?? '';
+const topic = TOPIC ?? '';
+
+
 // Check if SOURCE and DESTINATION are defined
-if (SOURCE === undefined || DESTINATION === undefined) {
+if (source === 'undefined' || destination === 'undefined') {
   console.error('SOURCE and DESTINATION are mandatory parameters.');
   process.exit(1);
 }
 
 // Your existing logic to start adapters based on parameters
-if (SOURCE === 'mqtts') {
+if (source === 'mqtts') {
   const connectionConfig = {
-    destination: DESTINATION,
-    localFilePath: LOCAL_FILE_PATH,
-    mqttsBroker: MQTTS_BROKER,
+    destination,
+    localFilePath,
+    mqttsBroker,
     clientId: CLIENT_ID,
     caFilePath: CA_FILE_PATH,
-    topic: TOPIC,
+    topic,
     s3BucketName: S3_BUCKET_NAME,
     s3FileKey: S3_FILE_KEY,
     s3Region: S3_REGION,
@@ -66,10 +73,10 @@ if (SOURCE === 'mqtts') {
     console.error('Error on starting MQTTS adapter:', error);
     process.exit(1);
   }
-} else if (SOURCE === 'http') {
+} else if (source === 'http') {
   const connectionConfig = {
-    destination: DESTINATION,
-    localFilePath: LOCAL_FILE_PATH,
+    destination,
+    localFilePath,
     httpPortNumber: parseInt(HTTP_PORT_NUMBER, 10),
     httpRoute: HTTP_ROUTE,
     s3BucketName: S3_BUCKET_NAME,
