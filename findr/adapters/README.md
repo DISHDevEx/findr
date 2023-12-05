@@ -1,13 +1,13 @@
 # Findr
 
-`adapters.ts` will take parameters from an API call to invoke `connections.ts`. `connections.ts` will invoke `mqtts.ts`, `http.ts`, `s3.ts`, and `dynamodb.ts`, as well as `processors.ts`.
+`index.ts` will take parameters from an API call to invoke `connections.ts`. `connections.ts` will invoke `mqtts.ts`, `http.ts`, `s3.ts`, and `dynamodb.ts`, as well as `processors.ts`.
 
 ## How to Use:
 
 In the repo's root directory, run the following command to start the Findr listener to receive API calls with parameters:
 
 ```console
-node dist/adapters.ts
+node dist/index.ts
 ```
 or
 ```console
@@ -17,10 +17,10 @@ npm run adapters
 ```
 findr/
 │
-├── src/
-│   ├── adapters.ts
+├── adapters/
+│   ├── index.ts
 │   │
-│   ├── adapters/
+│   ├── protocols/
 │   │   ├── mqtts.ts
 │   │   ├── http.ts
 │   │   ├── s3.ts
@@ -40,7 +40,7 @@ findr/
 
 ### Adapters
 
-- `adapters.ts`: Main file for managing adapters.
+- `index.ts`: Main file for taking parameters and invoke connections for adapters.
 
 ### Connections
 
@@ -66,12 +66,12 @@ findr/
 - **dynamodb.ts**
 - **connections.ts**
 - **processors.ts**
-- **adapters.ts**
+- **index.ts**
 
 ### For Traffic from IoT Devices
 
-1. Use `adapters.ts` as the entry point.
-2. Pass the following parameters to `adapters-index.ts` with API calls:
+1. Use `index.ts` as the entry point.
+2. Pass the following parameters to `connections.ts`:
 
     - **source**: Downstream protocol (e.g., mqtts).
     - **destination**: Upstream protocol (e.g., s3).
