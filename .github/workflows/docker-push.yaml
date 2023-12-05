@@ -36,4 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_adapters
           push: true
-          tags: taasmss/findr:adapter
+          tags: taasmss/findr:adapters
