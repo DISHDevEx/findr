@@ -68,14 +68,14 @@ class Connection {
   /**
    * Starts the MqttsAdapter for handling MQTT messages.
    */
-  public async startMqtts (): Promise<void> {
+  public startMqtts (): void {
     const mqttsBroker = this.mqttsBroker ?? ''
     const clientId = this.clientId ?? ''
     const caFilePath = this.caFilePath ?? ''
     const topic = this.topic ?? ''
     const mqttsAdapter = new MqttsAdapter(mqttsBroker, clientId, caFilePath, topic, this.receiveMqttsMessage.bind(this))
     console.log('Attempting to start MqttsAdapter in Connection.ts')
-    await mqttsAdapter.startClient().catch(() => {})
+    mqttsAdapter.startClient()
     console.log('MqttsAdapter started successfully in Connection.ts')
   }
 
@@ -145,12 +145,12 @@ class Connection {
   /**
    * Starts the HttpAdapter for handling HTTP messages.
    */
-  public async startHttp (): Promise<void> {
+  public startHttp (): void {
     const httpPortNumber = this.httpPortNumber ?? 3000
     const httpRoute = this.httpRoute ?? ''
     const httpAdapter = new HttpAdapter(httpPortNumber, httpRoute, this.receiveHttpMessage.bind(this))
     console.log('Attempting to start HttpAdapter in Connection.ts')
-    await httpAdapter.startServer().catch(() => {})
+    httpAdapter.startServer()
     console.log('HttpAdapter started successfully in Connection.ts')
   }
 

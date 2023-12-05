@@ -84,12 +84,9 @@ class HttpAdapter {
   /**
    * Starts the HTTP server.
    */
-  public async startServer (): Promise<void> {
-    await new Promise<void>((resolve) => {
-      this.http.listen(this.httpPortNumber, () => {
-        console.log(`Server is running on http://localhost:${this.httpPortNumber}`)
-        resolve()
-      })
+  public startServer (): void {
+    this.http.listen(this.httpPortNumber, () => {
+      console.log(`Server is running on http://localhost:${this.httpPortNumber}`)
     })
   }
 
