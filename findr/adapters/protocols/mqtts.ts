@@ -112,7 +112,7 @@ class MqttsAdapter {
    * @private
    */
   private subscribeToTopic (topic: string): void {
-    this.client.subscribe(topic, { qos: 0}, (err) => {
+    this.client.subscribe(topic, { qos: 2}, (err) => {
       if (err === null) {
         console.log(`Subscriber subscribed to ${this.topic} topic`)
       } else {

@@ -1,5 +1,5 @@
-import MqttsAdapter from './adapters/mqtts.js'
-import HttpAdapter from './adapters/http.js'
+import MqttsAdapter from './protocols/mqtts.js'
+import HttpAdapter from './protocols/http.js'
 import Processors from './processors.js'
 
 /**

@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "adapters": "npm run compile && node ./dist/adapters.js",
+    "adapters": "npm run compile && node ./dist/adapters/index.js",
     "test": "jest"
   },
   "jest": {
