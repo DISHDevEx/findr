@@ -45,7 +45,7 @@ export class DynamoDBUploader {
    * @returns {Promise<void>} A Promise that resolves when the upload is successful, or rejects on error.
    */
   public async uploadToDynamoDB (): Promise<void> {
-    console.log('Uploading to DynamoDB in DynamoDBUploader.ts')
+    console.log('Uploading to DynamoDB in dynamodb.ts')
 
     const fileContent = readFileSync(this.filePath, 'utf-8')
     const lines = fileContent.split('\n')

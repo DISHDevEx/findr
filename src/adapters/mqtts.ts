@@ -82,7 +82,7 @@ class MqttsAdapter {
         rejectUnauthorized: false
       }
 
-      console.log('Attempting to create a client in MqttsAdapter.ts')
+      console.log('Attempting to create a client in mqtts.ts')
       this.client = connect(this.mqttsBroker, options)
 
       this.client.on('error', (error) => {
@@ -107,9 +107,9 @@ class MqttsAdapter {
    * Starts the MQTT client.
    */
   public async startClient (): Promise<void> {
-    console.log('Attempting to connectClient() in MqttsAdapter.ts')
+    console.log('Attempting to connectClient() in mqtts.ts')
     await this.connectClient()
-    console.log('connectClient() complete in MqttsAdapter.ts')
+    console.log('connectClient() complete in mqtts.ts')
   }
 
   /**
