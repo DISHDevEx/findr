@@ -74,41 +74,35 @@ class MqttsAdapter {
    * Connects the MQTT client to the broker.
    * @private
    */
-  private async connectClient (): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
-      const options: IClientOptions = {
-        clientId: this.clientId,
-        ca: [readFileSync(this.caFilePath)],
-        rejectUnauthorized: false
-      }
-
-      console.log('Attempting to create a client in mqtts.ts')
-      this.client = connect(this.mqttsBroker, options)
-
-      this.client.on('error', (error) => {
-        console.error('Error connecting to MQTT broker:', error)
-        reject(error)
-      })
-
-      this.client.on('connect', () => {
-        console.log('Connected to MQTT broker')
-        this.subscribeToTopic(this.topic)
-
-        this.client.on('message', (receivedTopic, message) => {
-          this.receiveMqttsMessage(receivedTopic, message)
-        })
-
-        resolve()
-      })
-    })
+  private connectClient(): void {
+    const options: IClientOptions = {
+      clientId: this.clientId,
+      ca: [readFileSync(this.caFilePath)],
+      rejectUnauthorized: false
+    };
+  
+    console.log('Attempting to create a client in mqtts.ts');
+    this.client = connect(this.mqttsBroker, options);
+  
+    this.client.on('error', (error) => {
+      console.error('Error connecting to MQTT broker:', error);
+    });
   }
 
   /**
    * Starts the MQTT client.
    */
-  public async startClient (): Promise<void> {
+  public startClient (): void {
     console.log('Attempting to connectClient() in mqtts.ts')
-    await this.connectClient()
+    this.connectClient()
+    this.client.once('connect', () => {
+      console.log('Connected to MQTT broker');
+      this.subscribeToTopic(this.topic);
+      this.client.on('message', (receivedTopic, message) => {
+        console.log(`Received message on topic ${receivedTopic}: ${message.toString('utf-8')}`)
+        this.receiveMqttsMessage(receivedTopic, message);
+      });
+    });
     console.log('connectClient() complete in mqtts.ts')
   }
 
@@ -118,7 +112,7 @@ class MqttsAdapter {
    * @private
    */
   private subscribeToTopic (topic: string): void {
-    this.client.subscribe(topic, (err) => {
+    this.client.subscribe(topic, { qos: 0}, (err) => {
       if (err === null) {
         console.log(`Subscriber subscribed to ${this.topic} topic`)
       } else {
