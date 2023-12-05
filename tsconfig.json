@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDirs": ["src"],
+    "rootDirs": ["findr"],
     "outDir": "dist",
     "lib": ["es2020"],
     "target": "es2020",
@@ -10,6 +10,6 @@
     "strictNullChecks": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["findr/**/*.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }
