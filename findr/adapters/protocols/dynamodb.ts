@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { DynamoDBClient, PutItemCommand, type PutItemOutput , type PutItemCommandInput} from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient, PutItemCommand, type PutItemOutput, type PutItemCommandInput } from '@aws-sdk/client-dynamodb'
 
 /**
  * DynamoDBUploader is a class for uploading data to an Amazon DynamoDB table.
