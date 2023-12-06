@@ -1,4 +1,4 @@
-import Connection from './connections.js';
+import Connection from './connections.js'
 
 /**
  * Defines the endpoint to trigger the adapters based on the provided configuration.
@@ -32,24 +32,24 @@ const {
   S3_FILE_KEY,
   S3_REGION,
   DYNAMODB_TABLE_NAME,
-  DYNAMODB_REGION,
-} = process.env;
+  DYNAMODB_REGION
+} = process.env
 
 // Assign default values using nullish coalescing operator
-const source = SOURCE ?? '';
-const destination = DESTINATION ?? '';
-const localFilePath = LOCAL_FILE_PATH ?? '';
-const mqttsBroker = MQTTS_BROKER ?? '';
-const topic = TOPIC ?? '';
-const clientId = CLIENT_ID ?? '';
-const caFilePath = CA_FILE_PATH ?? '';
-const httpPortNumber = HTTP_PORT_NUMBER ?? '';
-const httpRoute = HTTP_ROUTE ?? '';
-const s3BucketName = S3_BUCKET_NAME ?? '';
-const s3FileKey = S3_FILE_KEY ?? '';
-const s3Region = S3_REGION ?? '';
-const dynamodbTableName = DYNAMODB_TABLE_NAME ?? '';
-const dynamodbRegion = DYNAMODB_REGION ?? '';
+const source = SOURCE ?? ''
+const destination = DESTINATION ?? ''
+const localFilePath = LOCAL_FILE_PATH ?? ''
+const mqttsBroker = MQTTS_BROKER ?? ''
+const topic = TOPIC ?? ''
+const clientId = CLIENT_ID ?? ''
+const caFilePath = CA_FILE_PATH ?? ''
+const httpPortNumber = HTTP_PORT_NUMBER ?? ''
+const httpRoute = HTTP_ROUTE ?? ''
+const s3BucketName = S3_BUCKET_NAME ?? ''
+const s3FileKey = S3_FILE_KEY ?? ''
+const s3Region = S3_REGION ?? ''
+const dynamodbTableName = DYNAMODB_TABLE_NAME ?? ''
+const dynamodbRegion = DYNAMODB_REGION ?? ''
 
 // Check if any of the mandatory parameters are empty strings
 const mandatoryParameters = [
@@ -66,18 +66,18 @@ const mandatoryParameters = [
   s3FileKey,
   s3Region,
   dynamodbTableName,
-  dynamodbRegion,
-];
+  dynamodbRegion
+]
 
 if (mandatoryParameters.some(param => param === '')) {
-  console.error('One or more mandatory parameters are empty strings.');
-  process.exit(1);
+  console.error('One or more mandatory parameters are empty strings.')
+  process.exit(1)
 }
 
 // Your existing logic to start adapters based on parameters
 if (source === '' || destination === '') {
-  console.error('SOURCE and DESTINATION are mandatory parameters.');
-  process.exit(1);
+  console.error('SOURCE and DESTINATION are mandatory parameters.')
+  process.exit(1)
 }
 
 // Your existing logic to start adapters based on parameters
@@ -93,17 +93,17 @@ if (source === 'mqtts') {
     s3FileKey,
     s3Region,
     dynamodbTableName,
-    dynamodbRegion,
-  };
+    dynamodbRegion
+  }
 
   try {
-    const connection = new Connection(connectionConfig);
-    connection.startMqtts();
-    console.log('MQTTS connection started successfully');
+    const connection = new Connection(connectionConfig)
+    connection.startMqtts()
+    console.log('MQTTS connection started successfully')
   } catch (error) {
     // Handle any potential errors here
-    console.error('Error on starting MQTTS adapter:', error);
-    process.exit(1);
+    console.error('Error on starting MQTTS adapter:', error)
+    process.exit(1)
   }
 } else if (source === 'http') {
   const connectionConfig = {
@@ -115,19 +115,19 @@ if (source === 'mqtts') {
     s3FileKey,
     s3Region,
     dynamodbTableName,
-    dynamodbRegion,
-  };
+    dynamodbRegion
+  }
 
   try {
-    const connection = new Connection(connectionConfig);
-    connection.startHttp();
-    console.log('HTTP connection started successfully');
+    const connection = new Connection(connectionConfig)
+    connection.startHttp()
+    console.log('HTTP connection started successfully')
   } catch (error) {
     // Handle any potential errors here
-    console.error('Error on starting HTTP adapter:', error);
-    process.exit(1);
+    console.error('Error on starting HTTP adapter:', error)
+    process.exit(1)
   }
 } else {
-  console.error('Invalid source. Expected "mqtts" or "http".');
-  process.exit(1);
+  console.error('Invalid source. Expected "mqtts" or "http".')
+  process.exit(1)
 }
