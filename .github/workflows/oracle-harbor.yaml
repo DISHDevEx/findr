@@ -3,7 +3,7 @@ name: Docker-Push
 on:
   push:
     branches:
-      - 'john/iot-storage'
+      - 'john/oracle'
 
 jobs:
   docker:
@@ -24,16 +24,17 @@ jobs:
           node -v
           npm -v
 
-      - name: Login to Docker Hub
+      - name: Login to Harbor
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+          server-url: ${{ secrets.HARBOR_REGISTRY }}
 
-      - name: Build and push adapters
+      - name: Build and push adapters to Harbor
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile_adapters
+          file: ./Dockerfile_oracle
           push: true
-          tags: taasmss/findr:tsc
+          tags: ${{ secrets.HARBOR_REGISTRY }}/findr:oracle
