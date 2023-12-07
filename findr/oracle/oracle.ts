@@ -262,7 +262,7 @@ class Oracle {
       const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent);
       console.log(response.data);
       return response.data;
-    } catch (error: AxiosError) {
+    } catch (error: any) {
       console.error('Error sending data:', error.message);
       if (error.response) {
         console.error('Response status:', error.response.status);
