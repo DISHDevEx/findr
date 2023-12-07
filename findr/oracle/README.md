@@ -1,0 +1,1 @@
+oracle.ts will provide findr back-end api to accept api request from findr UI, and then process Vault validation. If passing Vault validation, it will send all parameters to findr orchestrator to build connection between findr adapters and iot devices and send the response back to findr UI. Otherwise, it will send back the error messages to findr UI.
