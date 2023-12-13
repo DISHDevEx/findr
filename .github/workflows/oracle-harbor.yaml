@@ -32,6 +32,7 @@ jobs:
           registry: https://a2aceb41bed1449eab492bc6c7f92f64-618105827.us-east-1.elb.amazonaws.com:80/harbor/registries/findr
           env:
             DOCKER_CLI_FLAGS: "--insecure"
+            
       - name: Build and push adapters to Harbor
         uses: docker/build-push-action@v4
         with:
