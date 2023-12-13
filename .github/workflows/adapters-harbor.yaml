@@ -25,9 +25,8 @@ jobs:
           npm -v
 
       - name: Login to Harbor
-        run: echo ${{ secrets.HARBOR_PASSWORD }} | docker login -u ${{ secrets.HARBOR_USERNAME }} --password-stdin https://a2aceb41bed1449eab492bc6c7f92f64-618105827.us-east-1.elb.amazonaws.com/harbor/registries/findr
-        env:
-          DOCKER_CLI_FLAGS: "--insecure"
+        run: echo ${{ secrets.HARBOR_PASSWORD }} | DOCKER_TLS_CERTDIR='' docker login -u ${{ secrets.HARBOR_USERNAME }} --password-stdin https://a2aceb41bed1449eab492bc6c7f92f64-618105827.us-east-1.elb.amazonaws.com/harbor/registries/findr
+
 
       - name: Build and push adapters to Harbor
         uses: docker/build-push-action@v4
@@ -36,5 +35,3 @@ jobs:
           file: ./Dockerfile_adapters
           push: true
           tags: sss/findr:adapters
-        env:
-            DOCKER_CLI_FLAGS: --insecure
