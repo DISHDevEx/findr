@@ -39,3 +39,5 @@ jobs:
           file: ./Dockerfile_oracle
           push: true
           tags: sss/findr:oracle
+        env:
+            DOCKER_CLI_FLAGS: --insecure

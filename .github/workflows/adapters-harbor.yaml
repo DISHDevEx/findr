@@ -39,3 +39,5 @@ jobs:
           file: ./Dockerfile_adapters
           push: true
           tags: sss/findr:adapters
+        env:
+            DOCKER_CLI_FLAGS: --insecure
