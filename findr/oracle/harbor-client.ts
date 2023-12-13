@@ -23,11 +23,12 @@ class HarborClient {
   }
 
   async createProject(projectName: string): Promise<void> {
-    await axios.post(`${this.harborUrl}/api/projects`, {
+    const response = await axios.post(`${this.harborUrl}/api/projects`, {
       project_name: projectName
     }, {
       headers: { 'Authorization': this.getAuthToken() }
     });
+    return response.data;
   }
 }
 

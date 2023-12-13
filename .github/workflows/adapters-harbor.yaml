@@ -29,7 +29,7 @@ jobs:
         with:
           username: ${{ secrets.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
-          server-url: ${{ secrets.HARBOR_REGISTRY }}
+          server-url: a2aceb41bed1449eab492bc6c7f92f64-618105827.us-east-1.elb.amazonaws.com
 
       - name: Build and push adapters to Harbor
         uses: docker/build-push-action@v4
@@ -37,4 +37,4 @@ jobs:
           context: .
           file: ./Dockerfile_adapters
           push: true
-          tags: ${{ secrets.HARBOR_REGISTRY }}/findr:adapters
+          tags: sss/findr:adapters
