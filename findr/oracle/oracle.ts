@@ -2,10 +2,16 @@ import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { v4 as uuidv4 } from 'uuid'
 import VaultClient from './vault-client.js'
+<<<<<<< HEAD
 import OrchestratorApiClient from './orchestrator-client.js'
 // import dotenv from 'dotenv'
 
 // dotenv.config()
+=======
+import dotenv from 'dotenv'
+
+dotenv.config()
+>>>>>>> 581b6ca (add env)
 
 /**
  * The FindrBackendServer class represents the backend server for the Findr application.
