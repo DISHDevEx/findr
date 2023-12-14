@@ -423,8 +423,8 @@ class Oracle {
     this.messageToSent['caFilePath'] = caFilePath
 
     // Write path and values to Vault
-    const vaultUrl = 'http://aa803c51c76194a48b27d347eca79182-602502732.us-east-1.elb.amazonaws.com:8200'
-    const vaultToken = 'hvs.hdSOkPlJjBcLMkF3hbrdi2uz'
+    const vaultUrl = process.env.VAULT_URL
+    const vaultToken = process.env.VAULT_TOKEN
     const vaultPath = `${deviceId}-${this.uuid}`
     const vaultValue = this.messageToSent
     const vaultClient = new VaultClient(vaultUrl)
