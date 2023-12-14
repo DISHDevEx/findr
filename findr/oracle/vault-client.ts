@@ -66,7 +66,7 @@ class VaultClient {
       headers: { 'X-Vault-Token': this.token, accept: '*/*' }
     })
 
-    return response.data.data
+    return response.data
   }
 
   /**
@@ -86,6 +86,27 @@ class VaultClient {
       headers: { 'X-Vault-Token': this.token, 'Content-Type': 'application/json', accept: '*/*' }
     })
   }
+
+  /**
+   * Deletes secrets from a specified path.
+   * @param path - The path to the secret.
+   * @returns A Promise resolving to the secret data.
+   * @throws {Error} - If the client is not authenticated.
+   */
+  async deleteSecret (path: string): Promise<any> {
+    if (this.token === null || this.token === undefined) {
+      throw new Error('Client is not authenticated')
+    }
+
+    const encodedPath = this.encodeSpecialCharacters(path)
+
+    const response: AxiosResponse = await axios.delete(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, {
+      headers: { 'X-Vault-Token': this.token, accept: '*/*' }
+    })
+
+    return response.data
+  }
+
 }
 
 export default VaultClient

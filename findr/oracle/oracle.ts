@@ -1,7 +1,8 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import { v4 as uuidv4 } from 'uuid';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import express, { Request, Response } from 'express'
+import cors from 'cors'
+import { v4 as uuidv4 } from 'uuid'
+import axios, { AxiosResponse, AxiosError } from 'axios'
+import VaultClient from './vault-client.js'
 
 /**
  * The FindrBackendServer class represents the backend server for the Findr application.
@@ -34,6 +35,7 @@ class Oracle {
    */
   private initializeMessageToSent(): Record<string, any> {
     return {
+      'deviceId':'',
       'source': '',
       'destination': '',
       'uuid': '',
@@ -47,7 +49,6 @@ class Oracle {
       's3Region': '',
       'dynamodbTableName': '',
       'dynamodbRegion': '',
-      'port': '',
     };
   }
 
@@ -64,6 +65,15 @@ class Oracle {
    */
   private setupRoutes(): void {
     this.app.post(this.route, this.handleFindrBackendRequest);
+  }
+
+  /**
+   * Validates the deviceId parameter.
+   * @param {string} deviceId - The deviceId parameter to validate.
+   * @returns {boolean} True if the deviceId is a non-empty string, false otherwise.
+   */
+  private isValidDeviceId(deviceId: string): boolean {
+    return typeof deviceId === 'string' && deviceId.trim().length > 0;
   }
 
   /**
@@ -275,15 +285,15 @@ class Oracle {
     }
   };
 
-  /**
-   * Validates a parameter for use in the vault.
-   * @param {string} param1 - The parameter to validate.
-   * @returns {boolean} True if the parameter is valid for the vault, false otherwise.
-   */
-  private vaultValidation = (param1: string): boolean => {
-    // add logic here
-    return true
-  }
+  // /**
+  //  * Validates a parameter for use in the vault.
+  //  * @param {string} param1 - The parameter to validate.
+  //  * @returns {boolean} True if the parameter is valid for the vault, false otherwise.
+  //  */
+  // private vaultValidation = (vaultPath: string, vaultValue: string): any => {
+  //   // add logic here
+  //   return true
+  // }
 
   /**
    * Handles incoming Findr backend requests. Validates parameters and sends a request to the orchestrator.
@@ -293,6 +303,7 @@ class Oracle {
    */
   private handleFindrBackendRequest = (req: Request, res: Response): void => {
     const {
+      deviceId,
       source,
       destination,
       mqttsBroker,
@@ -312,6 +323,12 @@ class Oracle {
     this.uuid = uuidv4();
     this.messageToSent['uuid'] = this.uuid
 
+    if (this.isValidDeviceId(deviceId) === false) {
+      res.status(400).json({ error: 'Invalid deviceId' });
+      return; 
+    }
+    this.messageToSent['deviceId'] = deviceId
+
     if (this.isValidSource(source) === false || this.isValidDestination(destination) === false) {
       res.status(400).json({ error: 'Invalid source or destination' });
       return;
@@ -322,7 +339,7 @@ class Oracle {
         res.status(400).json({ error: 'Invalid source or destination' });
         return;
     }
-    let message = `Data received successfully! Source: ${source}, Destination: ${destination}, UUID: ${this.uuid},`
+    let message = `Data received successfully! DeviceId: ${deviceId}, Source: ${source}, Destination: ${destination}, UUID: ${this.uuid},`
 
     if (source === 'mqtts') {
         // Validate mqtts-specific parameters
@@ -339,6 +356,8 @@ class Oracle {
             this.messageToSent['topic'] = topic
             this.messageToSent['clientId'] = clientId
             this.messageToSent['containerPort'] = this.containerPort
+            this.messageToSent['httpPortNumber'] = ""
+            this.messageToSent['httpRoute'] = ""
             message += ` MqttsBroker: ${mqttsBroker}, ContainerPort: ${this.containerPort}, Topic: ${topic}, ClientId: ${clientId},`
         }
     } else if (source === 'http') {
@@ -355,6 +374,9 @@ class Oracle {
             this.messageToSent['httpPortNumber'] = httpPortNumber
             this.messageToSent['httpRoute'] = httpRoute
             this.messageToSent['containerPort'] = this.containerPort
+            this.messageToSent['mqttsBroker'] = ""
+            this.messageToSent['topic'] = ""
+            this.messageToSent['clientId'] = ""
             message += ` HttpPortNumber: ${httpPortNumber}, HttpRoute: ${httpRoute}, ContainerPort: ${this.containerPort}, Target_http: ${target_http},`
         }
     }
@@ -367,10 +389,13 @@ class Oracle {
           res.status(400).json({ error: 'Invalid s3 parameters' });
           return;
         } else {
+            this.messageToSent['destination'] = destination
             this.messageToSent['s3BucketName'] = s3BucketName
             this.messageToSent['s3FileKey'] = s3FileKey
             this.messageToSent['s3Region'] = s3Region
-            message += ` S3BucketName: ${s3BucketName}, S3FileKey: ${s3FileKey}, S3Region: ${s3Region},`
+            this.messageToSent['dynamodbTableName'] = ""
+            this.messageToSent['dynamodbRegion'] = ""
+            message += ` Destination: ${destination}, S3BucketName: ${s3BucketName}, S3FileKey: ${s3FileKey}, S3Region: ${s3Region},`
 
         }
     } else if (destination === 'dynamodb') {
@@ -380,23 +405,32 @@ class Oracle {
           res.status(400).json({ error: 'Invalid dynamodb parameters' })
           return
         } else {
+            this.messageToSent['destination'] = destination
             this.messageToSent['dynamodbTableName'] = dynamodbTableName
             this.messageToSent['dynamodbRegion'] = dynamodbRegion
-            message += ` DynamoDBTableName: ${dynamodbTableName}, DynamoDBRegion: ${dynamodbRegion},`
+            this.messageToSent['s3BucketName'] = ""
+            this.messageToSent['s3FileKey'] = ""
+            this.messageToSent['s3Region'] = ""
+            message += ` Destination: ${destination}, DynamoDBTableName: ${dynamodbTableName}, DynamoDBRegion: ${dynamodbRegion},`
         }
     }
 
-    // Add Valut block here
-    const param1 = 'param1'
-    if (this.vaultValidation(param1) === false) {
-        res.status(400).json({ error: 'Invalid Vault validation' })
-        return
-    }
+
 
     const localFilePath = '/app/findr_received.txt'
     const caFilePath = '/app/certs/ca.crt'
     this.messageToSent['localFilePath'] = localFilePath
     this.messageToSent['caFilePath'] = caFilePath
+
+    // Write path and values to Vault
+    const vaultUrl = 'http://aa803c51c76194a48b27d347eca79182-602502732.us-east-1.elb.amazonaws.com:8200'
+    const vaultToken = 'hvs.hdSOkPlJjBcLMkF3hbrdi2uz'
+    const vaultPath = `${deviceId}-${this.uuid}`
+    const vaultValue = this.messageToSent
+    const vaultClient = new VaultClient(vaultUrl)
+    vaultClient.authenticate(vaultToken)
+    vaultClient.writeSecret(vaultPath, vaultValue)
+    console.log('vaultPath:', vaultPath);
 
     const sendOrchestratorRequestUrl = 'ip' // Replace with the actual orchestrator URL
     const sendOrchestratorRequestResponse = this.sendOrchestratorRequest(
