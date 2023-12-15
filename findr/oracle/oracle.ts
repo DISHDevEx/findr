@@ -433,7 +433,9 @@ class Oracle {
     const vaultClient = new VaultClient(vaultUrl)
     vaultClient.authenticate(vaultToken)
     vaultClient.writeSecret(vaultPath, vaultValue)
-    console.log('vaultPath:', vaultPath);
+    console.log('vaultUrl:', vaultUrl)
+    console.log('vaultToken:', vaultToken)
+    console.log('vaultPath:', vaultPath)
 
     const sendOrchestratorRequestUrl = 'ip' // Replace with the actual orchestrator URL
     const sendOrchestratorRequestResponse = this.sendOrchestratorRequest(
