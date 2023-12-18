@@ -1,4 +1,7 @@
 import Connection from './connections.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 /**
  * Defines the endpoint to trigger the adapters based on the provided configuration.
