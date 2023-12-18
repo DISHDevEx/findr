@@ -426,11 +426,12 @@ class Oracle {
     const vaultUrl = process.env.VAULT_URL ?? ''
     const vaultToken = process.env.VAULT_TOKEN ?? ''
     const vaultPath = `${deviceId}-${this.uuid}`
+    console.log('vaultPath:', vaultPath)
     const vaultValue = this.messageToSent
     const vaultClient = new VaultClient(vaultUrl)
     await vaultClient.authenticate(vaultToken)
-    await vaultClient.writeSecret(vaultPath, vaultValue)
-    console.log('vaultPath:', vaultPath)
+    const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
+    console.log('vaultWriteResponse:', vaultWriteResponse)
 
     const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
     const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
