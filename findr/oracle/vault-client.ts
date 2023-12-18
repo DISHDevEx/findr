@@ -106,7 +106,6 @@ class VaultClient {
 
     return response.data
   }
-
 }
 
 export default VaultClient
