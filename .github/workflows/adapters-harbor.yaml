@@ -36,4 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_adapters
           push: true
-          tags: findr/adapters
+          tags: pravnreddy429/findr:adapters_v1
