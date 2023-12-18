@@ -3,7 +3,7 @@ name: Docker-Push
 on:
   push:
     branches:
-      - 'john/oracle'
+      - 'main'
 
 jobs:
   docker:
@@ -36,4 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_adapters
           push: true
-          tags: pravnreddy429/findr:adapters_v1
+          tags: pravnreddy429/findr_adapters:v6

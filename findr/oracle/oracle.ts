@@ -1,69 +1,86 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import { v4 as uuidv4 } from 'uuid';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import express, { type Request, type Response } from 'express'
+import cors from 'cors'
+import { v4 as uuidv4 } from 'uuid'
+import VaultClient from './vault-client.js'
+import OrchestratorApiClient from './orchestrator-client.js'
+// import dotenv from 'dotenv'
+
+// dotenv.config()
 
 /**
  * The FindrBackendServer class represents the backend server for the Findr application.
  * It handles incoming requests, validates parameters, and sends requests to the orchestrator.
  */
 class Oracle {
-  private app: express.Application;
-  private port: number;
-  private route: string;
-  private containerPort: number;
-  private uuid: string;
-  private messageToSent: Record<string, any>;
+  private readonly app: express.Application
+  private readonly port: number
+  private readonly route: string
+  private containerPort: number
+  private uuid: string
+  private readonly messageToSent: Record<string, any>
 
   /**
    * Constructs an instance of the FindrBackendServer class.
    * Initializes the Express application, sets up middleware, and initializes properties.
    */
-  constructor() {
-    this.app = express();
-    this.port = parseInt(process.env.API_PORT ?? '8080', 10);
-    this.route = process.env.API_ROUTE ?? '/oracle';
-    this.setupMiddleware();
-    this.setupRoutes();
-    this.messageToSent = this.initializeMessageToSent();
+  constructor () {
+    this.app = express()
+    this.port = parseInt(process.env.API_PORT ?? '9000', 10)
+    this.route = process.env.API_ROUTE ?? '/oracle'
+    this.setupMiddleware()
+    this.setupRoutes()
+    this.messageToSent = this.initializeMessageToSent()
   }
 
   /**
    * Initializes the messageToSent object with default values.
    * @returns {Record<string, any>} The initialized messageToSent object.
    */
-  private initializeMessageToSent(): Record<string, any> {
+  private initializeMessageToSent (): Record<string, any> {
     return {
-      'source': '',
-      'destination': '',
-      'uuid': '',
-      'mqttsBroker': '',
-      'topic': '',
-      'clientId': '',
-      'httpPortNumber': '',
-      'httpRoute': '',
-      's3BucketName': '',
-      's3FileKey': '',
-      's3Region': '',
-      'dynamodbTableName': '',
-      'dynamodbRegion': '',
-      'port': '',
-    };
+      deviceId: '',
+      source: '',
+      destination: '',
+      uuid: '',
+      mqttsBroker: '',
+      topic: '',
+      clientId: '',
+      httpIp: '',
+      httpResponseKey: '',
+      httpPortNumber: '',
+      httpRoute: '',
+      httpRequestInterval: '',
+      s3BucketName: '',
+      s3FileKey: '',
+      s3Region: '',
+      dynamodbTableName: '',
+      dynamodbRegion: '',
+      certificate: ''
+    }
   }
 
   /**
    * Sets up CORS and JSON body parsing middleware for the Express application.
    */
-  private setupMiddleware(): void {
-    this.app.use(cors());
-    this.app.use(express.json());
+  private setupMiddleware (): void {
+    this.app.use(cors())
+    this.app.use(express.json())
   }
 
   /**
    * Sets up routes for the Express application.
    */
-  private setupRoutes(): void {
-    this.app.post(this.route, this.handleFindrBackendRequest);
+  private setupRoutes (): void {
+    this.app.post(this.route, this.handleFindrBackendRequest.bind(this))
+  }
+
+  /**
+   * Validates the deviceId parameter.
+   * @param {string} deviceId - The deviceId parameter to validate.
+   * @returns {boolean} True if the deviceId is a non-empty string, false otherwise.
+   */
+  private isValidDeviceId (deviceId: string): boolean {
+    return typeof deviceId === 'string' && deviceId.trim().length > 0
   }
 
   /**
@@ -71,8 +88,8 @@ class Oracle {
    * @param {string} source - The source parameter to validate.
    * @returns {boolean} True if the source is valid, false otherwise.
    */
-  private isValidSource(source: string): boolean {
-    return source === 'mqtts' || source === 'http';
+  private isValidSource (source: string): boolean {
+    return source === 'mqtts' || source === 'http'
   }
 
   /**
@@ -80,8 +97,8 @@ class Oracle {
    * @param {string} destination - The destination parameter to validate.
    * @returns {boolean} True if the destination is valid, false otherwise.
    */
-  private isValidDestination(destination: string): boolean {
-    return destination === 'dynamodb' || destination === 's3';
+  private isValidDestination (destination: string): boolean {
+    return destination === 'dynamodb' || destination === 's3'
   }
 
   /**
@@ -89,14 +106,14 @@ class Oracle {
    * @param {string} mqttsBroker - The mqttsBroker parameter to validate.
    * @returns {boolean} True if the mqttsBroker has a valid format, false otherwise.
    */
-  private isValidMqttsBroker(mqttsBroker: string): boolean {
-    const pattern = /^mqtts:\/\/(?:\d{1,3}\.){3}\d{1,3}:(?:[3-9]\d{3}|[1-5]\d{4}|6[0-5][0-5][0-3][0-5])$/;
-    if (pattern.test(mqttsBroker) === false) {
-      console.error('Invalid mqttsBroker format. Please provide a valid broker URL with a port in the range of 3000 to 65535.');
-      console.error('Mismatch details:', mqttsBroker.match(pattern));
+  private isValidMqttsBroker (mqttsBroker: string): boolean {
+    const pattern = /^mqtts:\/\/(?:\d{1,3}\.){3}\d{1,3}:(?:[3-9]\d{3}|[1-5]\d{4}|6[0-5][0-5][0-3][0-5])$/
+    if (!pattern.test(mqttsBroker)) {
+      console.error('Invalid mqttsBroker format. Please provide a valid broker URL with a port in the range of 3000 to 65535.')
+      console.error('Mismatch details:', mqttsBroker.match(pattern))
     }
 
-    return pattern.test(mqttsBroker);
+    return pattern.test(mqttsBroker)
   }
 
   /**
@@ -104,8 +121,8 @@ class Oracle {
    * @param {string} topic - The topic parameter to validate.
    * @returns {boolean} True if the topic is a non-empty string, false otherwise.
    */
-  private isValidTopic(topic: string): boolean {
-    return typeof topic === 'string' && topic.trim().length > 0;
+  private isValidTopic (topic: string): boolean {
+    return typeof topic === 'string' && topic.trim().length > 0
   }
 
   /**
@@ -113,8 +130,27 @@ class Oracle {
    * @param {string} clientId - The clientId parameter to validate.
    * @returns {boolean} True if the clientId is a non-empty string, false otherwise.
    */
-  private isValidClientId(clientId: string): boolean {
-    return typeof clientId === 'string' && clientId.trim().length > 0;
+  private isValidClientId (clientId: string): boolean {
+    return typeof clientId === 'string' && clientId.trim().length > 0
+  }
+
+  /**
+   * Check if a httpIp is in IPv4 format.
+   * @param {string} httpIp - The string to check.
+   * @returns {boolean} - True if the string is in IPv4 format, false otherwise.
+   */
+  private isValidHttpIp (httpIp: string): boolean {
+    const ipv4Pattern = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/
+    return ipv4Pattern.test(httpIp)
+  }
+
+  /**
+   * Validates the topic parameter.
+   * @param {string} httpResponseKey - The topic parameter to validate.
+   * @returns {boolean} True if the topic is a non-empty string, false otherwise.
+   */
+  private isValidHttpResponseKey (httpResponseKey: string): boolean {
+    return typeof httpResponseKey === 'string' && httpResponseKey.trim().length > 0
   }
 
   /**
@@ -122,9 +158,9 @@ class Oracle {
    * @param {string} httpPortNumber - The httpPortNumber parameter to validate.
    * @returns {boolean} True if the httpPortNumber is a valid port number, false otherwise.
    */
-  private isValidHttpPortNumber(httpPortNumber: string): boolean {
-    const port = parseInt(httpPortNumber, 10);
-    return isNaN(port) === false && port >= 3000 && port <= 65535;
+  private isValidHttpPortNumber (httpPortNumber: string): boolean {
+    const port = parseInt(httpPortNumber, 10)
+    return !isNaN(port) && port >= 3000 && port <= 65535
   }
 
   /**
@@ -132,9 +168,20 @@ class Oracle {
    * @param {string} httpRoute - The httpRoute parameter to validate.
    * @returns {boolean} True if the httpRoute is a valid HTTP route, false otherwise.
    */
-  private isValidHttpRoute(httpRoute: string): boolean {
-    const pattern = /^\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+$/;
-    return pattern.test(httpRoute);
+  private isValidHttpRoute (httpRoute: string): boolean {
+    const pattern = /^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+$/
+    return pattern.test(httpRoute)
+  }
+
+  /**
+   * Check if a string is a positive number.
+   * @param {string} httpRequestInterval - The string to check.
+   * @returns {boolean} - True if the string is a positive number, false otherwise.
+   */
+  private isValidHttpRequestInterval (httpRequestInterval: string): boolean {
+    // Use the unary plus operator to convert the string to a number and check if it's a valid number
+    const numericValue = +httpRequestInterval
+    return !isNaN(numericValue) && numericValue > 0
   }
 
   /**
@@ -142,11 +189,11 @@ class Oracle {
    * @param {string} s3BucketName - The s3BucketName parameter to validate.
    * @returns {boolean} True if the s3BucketName adheres to specified rules, false otherwise.
    */
-  private isValidS3BucketName(s3BucketName: string): boolean {
-    const pattern = /^[a-z0-9.-]{3,63}$/;
+  private isValidS3BucketName (s3BucketName: string): boolean {
+    const pattern = /^[a-z0-9.-]{3,63}$/
     if (
-      pattern.test(s3BucketName) === false ||
-      /^[a-z0-9]/.test(s3BucketName) === false ||
+      !pattern.test(s3BucketName) ||
+      !/^[a-z0-9]/.test(s3BucketName) ||
       /[.-]{2}/.test(s3BucketName) ||
       /[.-]$/.test(s3BucketName) ||
       s3BucketName.startsWith('xn--') ||
@@ -155,9 +202,9 @@ class Oracle {
       s3BucketName.endsWith('-s3alias') ||
       s3BucketName.endsWith('--ol-s3')
     ) {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
 
   /**
@@ -165,9 +212,9 @@ class Oracle {
    * @param {string} s3FileKey - The s3FileKey parameter to validate.
    * @returns {boolean} True if the s3FileKey adheres to specified rules, false otherwise.
    */
-  private isValidS3FileKey(s3FileKey: string): boolean {
-    const pattern = /^[0-9a-zA-Z!-_.*'()]+$/;
-    return pattern.test(s3FileKey);
+  private isValidS3FileKey (s3FileKey: string): boolean {
+    const pattern = /^[0-9a-zA-Z!-_.*'()]+$/
+    return pattern.test(s3FileKey)
   }
 
   /**
@@ -175,7 +222,7 @@ class Oracle {
    * @param {string} s3Region - The s3Region parameter to validate.
    * @returns {boolean} True if the s3Region is a valid S3 region, false otherwise.
    */
-  private isValidS3Region(s3Region: string): boolean {
+  private isValidS3Region (s3Region: string): boolean {
     const validS3Regions = [
       'us-east-1',
       'us-east-2',
@@ -193,9 +240,9 @@ class Oracle {
       'ap-southeast-1',
       'ap-southeast-2',
       'ap-south-1',
-      'sa-east-1',
-    ];
-    return validS3Regions.includes(s3Region);
+      'sa-east-1'
+    ]
+    return validS3Regions.includes(s3Region)
   }
 
   /**
@@ -203,9 +250,9 @@ class Oracle {
    * @param {string} dynamodbTableName - The dynamodbTableName parameter to validate.
    * @returns {boolean} True if the dynamodbTableName adheres to specified rules, false otherwise.
    */
-  private isValidDynamoDBTableName(dynamodbTableName: string): boolean {
-    const pattern = /^[a-zA-Z0-9_.\-]{3,255}$/;
-    return pattern.test(dynamodbTableName);
+  private isValidDynamoDBTableName (dynamodbTableName: string): boolean {
+    const pattern = /^[a-zA-Z0-9_.-]{3,255}$/
+    return pattern.test(dynamodbTableName)
   }
 
   /**
@@ -213,7 +260,7 @@ class Oracle {
    * @param {string} dynamodbRegion - The dynamodbRegion parameter to validate.
    * @returns {boolean} True if the dynamodbRegion is a valid DynamoDB region, false otherwise.
    */
-  private isValidDynamoDBRegion(dynamodbRegion: string): boolean {
+  private isValidDynamoDBRegion (dynamodbRegion: string): boolean {
     const validDynamoDBRegions = [
       'us-east-1',
       'us-east-2',
@@ -231,9 +278,9 @@ class Oracle {
       'ap-southeast-1',
       'ap-southeast-2',
       'ap-south-1',
-      'sa-east-1',
-    ];
-    return validDynamoDBRegions.includes(dynamodbRegion);
+      'sa-east-1'
+    ]
+    return validDynamoDBRegions.includes(dynamodbRegion)
   }
 
   /**
@@ -241,48 +288,13 @@ class Oracle {
    * @param {string} mqttsBroker - The mqttsBroker parameter.
    * @returns {number} The extracted port number or the default port (8883) if not found.
    */
-  private extractMqttsPort(mqttsBroker: string): number {
-    const portPattern = /:(\d+)$/;
-    const match = mqttsBroker.match(portPattern);
-    if (match && match[1]) {
-      return parseInt(match[1], 10);
+  private extractMqttsPort (mqttsBroker: string): number {
+    const portPattern = /:(\d+)$/
+    const match = mqttsBroker.match(portPattern)
+    if (match?.[1] !== null && match?.[1] !== undefined) {
+      return parseInt(match[1], 10)
     }
-    return 8883;
-  }
-
-  /**
-   * Sends a request to the orchestrator API with the provided parameters.
-   * Logs the response or error details.
-   * @param {string} orchestratorUrl - The URL of the orchestrator API.
-   * @param {object} messageToSent - The message to send in the request.
-   * @returns {Promise<any>} A promise representing the orchestrator API response.
-   */
-  private sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
-    try {
-      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent);
-      console.log(response.data);
-      return response.data;
-    } catch (error: any) {
-      console.error('Error sending data:', error.message);
-      if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-      } else {
-        console.error('Error details:', error.message);
-      }
-    }
-  };
-
-  /**
-   * Validates a parameter for use in the vault.
-   * @param {string} param1 - The parameter to validate.
-   * @returns {boolean} True if the parameter is valid for the vault, false otherwise.
-   */
-  private vaultValidation = (param1: string): boolean => {
-    // add logic here
-    return true
+    return 8883
   }
 
   /**
@@ -291,138 +303,211 @@ class Oracle {
    * @param {Request} req - The Express request object.
    * @param {Response} res - The Express response object.
    */
-  private handleFindrBackendRequest = (req: Request, res: Response): void => {
+  private readonly handleFindrBackendRequest = async (req: Request, res: Response): Promise<void> => {
     const {
+      deviceId,
       source,
       destination,
       mqttsBroker,
       topic,
       clientId,
+      httpIp,
+      httpResponseKey,
       httpPortNumber,
       httpRoute,
+      httpRequestInterval,
       s3BucketName,
       s3FileKey,
       s3Region,
       dynamodbTableName,
       dynamodbRegion,
-    } = req.body;
+      certificate
+    } = req.body
 
-    console.log('Received request with parameters:', req.body);
+    console.log('Received request with parameters:', req.body)
 
-    this.uuid = uuidv4();
-    this.messageToSent['uuid'] = this.uuid
+    this.uuid = uuidv4()
+    this.messageToSent.uuid = this.uuid
+    this.messageToSent.certificate = certificate
 
-    if (this.isValidSource(source) === false || this.isValidDestination(destination) === false) {
-      res.status(400).json({ error: 'Invalid source or destination' });
-      return;
+    if (!this.isValidDeviceId(deviceId)) {
+      res.status(400).send('Invalid deviceId')
+      return
+    }
+    this.messageToSent.deviceId = deviceId
+
+    if (!this.isValidSource(source) || !this.isValidDestination(destination)) {
+      res.status(400).send('Invalid source or destination')
+      return
     }
 
     // Validate other parameters
-    if (this.isValidSource(source) === false || this.isValidDestination(destination) === false) {
-        res.status(400).json({ error: 'Invalid source or destination' });
-        return;
+    if (!this.isValidSource(source) || !this.isValidDestination(destination)) {
+      res.status(400).send('Invalid source or destination')
+      return
     }
-    let message = `Data received successfully! Source: ${source}, Destination: ${destination}, UUID: ${this.uuid},`
+    let message = `Data received successfully! DeviceId: ${deviceId}, Source: ${source}, Destination: ${destination}, UUID: ${this.uuid},`
 
     if (source === 'mqtts') {
-        // Validate mqtts-specific parameters
-        // 
-        if (this.isValidMqttsBroker(mqttsBroker) === false ||
-            this.isValidTopic(topic) === false ||
-            this.isValidClientId(clientId) === false) {
-          res.status(400).json({ error: 'Invalid mqtts parameters' });
-          return;
-        } else {
-            this.containerPort = this.extractMqttsPort(mqttsBroker)
-            this.messageToSent['source'] = source
-            this.messageToSent['mqttsBroker'] = mqttsBroker
-            this.messageToSent['topic'] = topic
-            this.messageToSent['clientId'] = clientId
-            this.messageToSent['containerPort'] = this.containerPort
-            message += ` MqttsBroker: ${mqttsBroker}, ContainerPort: ${this.containerPort}, Topic: ${topic}, ClientId: ${clientId},`
-        }
-    } else if (source === 'http') {
-        // Validate http-specific parameters
-        if (this.isValidHttpPortNumber(httpPortNumber) === false ||
-            this.isValidHttpRoute(httpRoute) === false) {
-          res.status(400).json({ error: 'Invalid http parameters' });
-          return;
-        } else {
-            this.containerPort = parseInt(httpPortNumber, 10)
-            // will get target_http from edge cluster
-            const target_http = '165.225.216.231'
-            this.messageToSent['source'] = source
-            this.messageToSent['httpPortNumber'] = httpPortNumber
-            this.messageToSent['httpRoute'] = httpRoute
-            this.messageToSent['containerPort'] = this.containerPort
-            message += ` HttpPortNumber: ${httpPortNumber}, HttpRoute: ${httpRoute}, ContainerPort: ${this.containerPort}, Target_http: ${target_http},`
-        }
-    }
-  
-    if (destination === 's3') {
-        // Validate s3-specific parameters
-        if (this.isValidS3BucketName(s3BucketName) === false ||
-            this.isValidS3FileKey(s3FileKey) === false ||
-            this.isValidS3Region(s3Region) === false) {
-          res.status(400).json({ error: 'Invalid s3 parameters' });
-          return;
-        } else {
-            this.messageToSent['s3BucketName'] = s3BucketName
-            this.messageToSent['s3FileKey'] = s3FileKey
-            this.messageToSent['s3Region'] = s3Region
-            message += ` S3BucketName: ${s3BucketName}, S3FileKey: ${s3FileKey}, S3Region: ${s3Region},`
-
-        }
-    } else if (destination === 'dynamodb') {
-        // Validate dynamodb-specific parameters
-        if (this.isValidDynamoDBTableName(dynamodbTableName) === false ||
-            this.isValidDynamoDBRegion(dynamodbRegion) === false) {
-          res.status(400).json({ error: 'Invalid dynamodb parameters' })
-          return
-        } else {
-            this.messageToSent['dynamodbTableName'] = dynamodbTableName
-            this.messageToSent['dynamodbRegion'] = dynamodbRegion
-            message += ` DynamoDBTableName: ${dynamodbTableName}, DynamoDBRegion: ${dynamodbRegion},`
-        }
-    }
-
-    // Add Valut block here
-    const param1 = 'param1'
-    if (this.vaultValidation(param1) === false) {
-        res.status(400).json({ error: 'Invalid Vault validation' })
+      // Validate mqtts-specific parameters
+      //
+      if (!this.isValidMqttsBroker(mqttsBroker) ||
+            !this.isValidTopic(topic) ||
+            !this.isValidClientId(clientId)) {
+        res.status(400).send('Invalid mqtts parameters')
         return
+      } else {
+        this.containerPort = this.extractMqttsPort(mqttsBroker)
+        this.messageToSent.source = source
+        this.messageToSent.mqttsBroker = mqttsBroker
+        this.messageToSent.topic = topic
+        this.messageToSent.clientId = clientId
+        this.messageToSent.containerPort = this.containerPort
+        this.messageToSent.httpPortNumber = ''
+        this.messageToSent.httpRoute = ''
+        message += ` MqttsBroker: ${mqttsBroker}, ContainerPort: ${this.containerPort}, Topic: ${topic}, ClientId: ${clientId},`
+      }
+    } else if (source === 'http') {
+      // Validate http-specific parameters
+      if (!this.isValidHttpPortNumber(httpPortNumber) ||
+            !this.isValidHttpRoute(httpRoute) ||
+            !this.isValidHttpIp(httpIp) ||
+            !this.isValidHttpResponseKey(httpResponseKey) ||
+            !this.isValidHttpRequestInterval(httpRequestInterval)) {
+        res.status(400).send('Invalid http parameters')
+        return
+      } else {
+        this.containerPort = parseInt(httpPortNumber, 10)
+        this.messageToSent.source = source
+        this.messageToSent.httpIp = httpIp
+        this.messageToSent.httpResponseKey = httpResponseKey
+        this.messageToSent.httpPortNumber = httpPortNumber
+        this.messageToSent.httpRoute = httpRoute
+        this.messageToSent.httpRequestInterval = httpRequestInterval
+        this.messageToSent.containerPort = this.containerPort
+        this.messageToSent.mqttsBroker = ''
+        this.messageToSent.topic = ''
+        this.messageToSent.clientId = ''
+        message += ` HttpIp: ${httpIp}, HttpResponseKey: ${httpResponseKey}, HttpPortNumber: ${httpPortNumber}, HttpRoute: ${httpRoute}, HttpRequestInterval: ${httpRequestInterval}, ContainerPort: ${this.containerPort},`
+      }
+    }
+
+    if (destination === 's3') {
+      // Validate s3-specific parameters
+      if (!this.isValidS3BucketName(s3BucketName) ||
+            !this.isValidS3FileKey(s3FileKey) ||
+            !this.isValidS3Region(s3Region)) {
+        res.status(400).send('Invalid s3 parameters')
+        return
+      } else {
+        this.messageToSent.destination = destination
+        this.messageToSent.s3BucketName = s3BucketName
+        this.messageToSent.s3FileKey = s3FileKey
+        this.messageToSent.s3Region = s3Region
+        this.messageToSent.dynamodbTableName = ''
+        this.messageToSent.dynamodbRegion = ''
+        message += ` Destination: ${destination}, S3BucketName: ${s3BucketName}, S3FileKey: ${s3FileKey}, S3Region: ${s3Region},`
+      }
+    } else if (destination === 'dynamodb') {
+      // Validate dynamodb-specific parameters
+      if (!this.isValidDynamoDBTableName(dynamodbTableName) ||
+            !this.isValidDynamoDBRegion(dynamodbRegion)) {
+        res.status(400).send('Invalid dynamodb parameters')
+        return
+      } else {
+        this.messageToSent.destination = destination
+        this.messageToSent.dynamodbTableName = dynamodbTableName
+        this.messageToSent.dynamodbRegion = dynamodbRegion
+        this.messageToSent.s3BucketName = ''
+        this.messageToSent.s3FileKey = ''
+        this.messageToSent.s3Region = ''
+        message += ` Destination: ${destination}, DynamoDBTableName: ${dynamodbTableName}, DynamoDBRegion: ${dynamodbRegion},`
+      }
     }
 
     const localFilePath = '/app/findr_received.txt'
     const caFilePath = '/app/certs/ca.crt'
-    this.messageToSent['localFilePath'] = localFilePath
-    this.messageToSent['caFilePath'] = caFilePath
+    this.messageToSent.localFilePath = localFilePath
+    this.messageToSent.caFilePath = caFilePath
+    console.log('UI parameter validation finished.')
 
-    const sendOrchestratorRequestUrl = 'ip' // Replace with the actual orchestrator URL
-    const sendOrchestratorRequestResponse = this.sendOrchestratorRequest(
-      sendOrchestratorRequestUrl,
-      this.messageToSent
-    )
-    console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse);
+    // Write path and values to Vault
+    const vaultUrl = process.env.VAULT_URL ?? ''
+    const vaultToken = process.env.VAULT_TOKEN ?? ''
+    const vaultPath = `${deviceId}-${this.uuid}`
+    const vaultPathToOrchestrator = `kv/${deviceId}-${this.uuid}`
+    console.log('vaultPath:', vaultPath)
+    const vaultValue = {
+      data: this.messageToSent,
+      options: {},
+      version: 0
+    }
+    try {
+      // const vaultValue = this.messageToSent // This is for chubbyhole
+      const vaultClient = new VaultClient(vaultUrl)
+      await vaultClient.authenticate(vaultToken)
+      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
+      console.log('vaultWriteResponse:', vaultWriteResponse)
+    } catch (error) {
+      // Handle errors
+      console.error('Error writing to Vault:', error.message)
+      res.status(500).send(
+        'Cannot pass vault validation, please contact system administrator for help'
+      )
+    }
 
-    message += ' are received parameters'
-    res.status(200).json({
-        message,
-    })
-  };
+    const vaultClient = new VaultClient(vaultUrl)
+    await vaultClient.authenticate(vaultToken)
+    const awsCredentials = await vaultClient.readSecret('aws-credentials')
+    console.log('awsCredentials:', awsCredentials)
+    const awsAccessKeyId = awsCredentials.data.data.awsAccessKeyId
+    const awsSecretAccessKey = awsCredentials.data.data.awsSecretAccessKey
+    const awsSessionToken = awsCredentials.data.data.awsSessionToken
+    console.log('awsAccessKeyId:', awsAccessKeyId)
+
+    const vaultPathObject = {
+      cluster_config: 'kv/iot-findr-edge',
+      cluster_name: 'iot-findr-edge',
+      connection_info: vaultPathToOrchestrator,
+      namespace: 'findr',
+      container_image: 'docker.io/pravnreddy429/findr_adapters:v6',
+      aws_access_key_id: awsAccessKeyId,
+      aws_secret_access_key: awsSecretAccessKey,
+      aws_session_token: awsSessionToken
+    }
+    try {
+      const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
+      const orchestratorApiClient = new OrchestratorApiClient()
+      const sendOrchestratorRequestResponse = await orchestratorApiClient.sendOrchestratorRequest(
+        sendOrchestratorRequestUrl,
+        // this.messageToSent // This can be passed to orchestrator if all params are needed
+        vaultPathObject
+      )
+      console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse)
+      message += ' are received parameters'
+      res.status(sendOrchestratorRequestResponse).send(
+        message
+      )
+    } catch (error) {
+      // Handle errors
+      console.error('Error sendOrchestratorRequestResponse:', error.message)
+      res.status(500).send('Cannot get response from orchestrator, please contact system administrator for help'
+      )
+    }
+  }
 
   /**
    * Starts the Express server on the specified port.
    */
-  public startServer(): void {
+  public startServer (): void {
     this.app.listen(this.port, () => {
-      console.log(`Server is running on port ${this.port}`);
-    });
+      console.log(`Server is running on port ${this.port}`)
+    })
   }
 }
 
 // Create an instance of the FindrBackendServer class
-const oracle = new Oracle();
+const oracle = new Oracle()
 
 // Start the server
-oracle.startServer();
+oracle.startServer()
