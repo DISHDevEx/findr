@@ -17,12 +17,14 @@ COPY package*.json tsconfig.json ./
 # Install app dependencies
 RUN npm install
 
-# Install AWS CLI
+# Install AWS CLI using the bundled installer
 RUN apk --no-cache add \
     bash \
     jq \
-    py3-pip \
-  && pip3 install --upgrade awscli
+  && wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2.zip" \
+  && unzip awscliv2.zip \
+  && sudo ./aws/install \
+  && rm awscliv2.zip
 
 # Copy the source code to the working directory
 COPY findr/adapters ./findr/adapters

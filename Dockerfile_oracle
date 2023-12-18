@@ -31,7 +31,7 @@ COPY findr/oracle ./findr/oracle
 RUN npm run compile
 
 # Expose the default port
-# EXPOSE 8080
+EXPOSE 8080
 
 # CMD instruction dynamically sets the port based on the adapter type
 # CMD ["sh", "-c", "npm run adapters -- --port $(if [ \"$ADAPTER_TYPE\" = \"http\" ]; then echo 3000; else echo 8883; fi)"]
