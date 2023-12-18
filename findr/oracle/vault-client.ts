@@ -75,16 +75,18 @@ class VaultClient {
    * @param secretData - The data to be written as the secret.
    * @throws {Error} - If the client is not authenticated.
    */
-  async writeSecret (path: string, secretData: any): Promise<void> {
+  async writeSecret (path: string, secretData: any): Promise<any> {
     if (this.token === null || this.token === undefined) {
       throw new Error('Client is not authenticated')
     }
 
     const encodedPath = this.encodeSpecialCharacters(path)
 
-    await axios.post(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, secretData, {
+    const response: AxiosResponse = await axios.post(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, secretData, {
       headers: { 'X-Vault-Token': this.token, 'Content-Type': 'application/json', accept: '*/*' }
     })
+
+    return response.status
   }
 
   /**
