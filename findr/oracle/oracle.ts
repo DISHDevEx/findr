@@ -435,10 +435,10 @@ class Oracle {
     vaultClient.writeSecret(vaultPath, vaultValue)
     console.log('vaultPath:', vaultPath)
 
-    const sendOrchestratorRequestUrl = 'ip' // Replace with the actual orchestrator URL
+    const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
     const sendOrchestratorRequestResponse = this.sendOrchestratorRequest(
       sendOrchestratorRequestUrl,
-      this.messageToSent
+      this.messageToSent  
     )
     console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse);
 
