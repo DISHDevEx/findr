@@ -62,7 +62,7 @@ class VaultClient {
 
     const encodedPath = this.encodeSpecialCharacters(path)
 
-    const response: AxiosResponse = await axios.get(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, {
+    const response: AxiosResponse = await axios.get(`${this.vaultUrl}/v1/kv/data/${encodedPath}`, {
       headers: { 'X-Vault-Token': this.token, accept: '*/*' }
     })
 
@@ -82,7 +82,7 @@ class VaultClient {
 
     const encodedPath = this.encodeSpecialCharacters(path)
 
-    const response: AxiosResponse = await axios.post(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, secretData, {
+    const response: AxiosResponse = await axios.post(`${this.vaultUrl}/v1/kv/data/${encodedPath}`, secretData, {
       headers: { 'X-Vault-Token': this.token, 'Content-Type': 'application/json', accept: '*/*' }
     })
 
@@ -104,7 +104,7 @@ class VaultClient {
 
     const encodedPath = this.encodeSpecialCharacters(path)
 
-    const response: AxiosResponse = await axios.delete(`${this.vaultUrl}/v1/cubbyhole/${encodedPath}`, {
+    const response: AxiosResponse = await axios.delete(`${this.vaultUrl}/v1/kv/data/${encodedPath}`, {
       headers: { 'X-Vault-Token': this.token, accept: '*/*' }
     })
 
