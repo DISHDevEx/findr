@@ -418,11 +418,16 @@ class Oracle {
     const vaultToken = process.env.VAULT_TOKEN ?? ''
     const vaultPath = `${deviceId}-${this.uuid}`
     console.log('vaultPath:', vaultPath)
+    const vaultPathObject ={
+      "data": {"vaultPath": vaultPath},
+      "options": {},
+      "version": 0
+    }
     try {
-      const vaultValue = this.messageToSent
+      // const vaultValue = this.messageToSent // This is for chubbyhole
       const vaultClient = new VaultClient(vaultUrl)
       await vaultClient.authenticate(vaultToken)
-      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
+      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultPathObject)
       console.log('vaultWriteResponse:', vaultWriteResponse)
     } catch (error) {
       // Handle errors
@@ -433,9 +438,6 @@ class Oracle {
     }
 
     try {
-      const vaultPathObject = {
-        vaultPath
-      }
       const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
       const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
         sendOrchestratorRequestUrl,
