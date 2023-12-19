@@ -288,16 +288,6 @@ class Oracle {
     }
   }
 
-  // /**
-  //  * Validates a parameter for use in the vault.
-  //  * @param {string} param1 - The parameter to validate.
-  //  * @returns {boolean} True if the parameter is valid for the vault, false otherwise.
-  //  */
-  // private vaultValidation = (vaultPath: string, vaultValue: string): any => {
-  //   // add logic here
-  //   return true
-  // }
-
   /**
    * Handles incoming Findr backend requests. Validates parameters and sends a request to the orchestrator.
    * Responds with a success message or error details.
@@ -421,28 +411,45 @@ class Oracle {
     const caFilePath = '/app/certs/ca.crt'
     this.messageToSent.localFilePath = localFilePath
     this.messageToSent.caFilePath = caFilePath
+    console.log('UI parameter validation finished.')
 
     // Write path and values to Vault
     const vaultUrl = process.env.VAULT_URL ?? ''
     const vaultToken = process.env.VAULT_TOKEN ?? ''
     const vaultPath = `${deviceId}-${this.uuid}`
     console.log('vaultPath:', vaultPath)
-    const vaultValue = this.messageToSent
-    const vaultClient = new VaultClient(vaultUrl)
-    await vaultClient.authenticate(vaultToken)
-    const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
-    console.log('vaultWriteResponse:', vaultWriteResponse)
-    const vaultPathObject = {
-      'vaultPath': vaultPath
+    try {
+      const vaultValue = this.messageToSent
+      const vaultClient = new VaultClient(vaultUrl)
+      await vaultClient.authenticate(vaultToken)
+      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
+      console.log('vaultWriteResponse:', vaultWriteResponse)
+    } catch (error) {
+      // Handle errors
+      console.error('Error writing to Vault:', error.message)
+      res.status(500).json({
+        error: 'Cannot pass vault validation, please contact system administrator for help'
+      })
     }
 
-    const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
-    const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
-      sendOrchestratorRequestUrl,
-      // this.messageToSent // This can be passed to orchestrator if all params are needed
-      vaultPathObject
-    )
-    console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse)
+    try {
+      const vaultPathObject = {
+        vaultPath
+      }
+      const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
+      const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
+        sendOrchestratorRequestUrl,
+        // this.messageToSent // This can be passed to orchestrator if all params are needed
+        vaultPathObject
+      )
+      console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse)
+    } catch (error) {
+      // Handle errors
+      console.error('Error sendOrchestratorRequestResponse:', error.message)
+      res.status(500).json({
+        error: 'Cannot get response from orchestrator, please contact system administrator for help'
+      })
+    }
 
     message += ' are received parameters'
     res.status(200).json({
