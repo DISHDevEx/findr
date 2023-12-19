@@ -418,8 +418,8 @@ class Oracle {
     const vaultToken = process.env.VAULT_TOKEN ?? ''
     const vaultPath = `${deviceId}-${this.uuid}`
     console.log('vaultPath:', vaultPath)
-    const vaultPathObject ={
-      "data": {"vaultPath": vaultPath},
+    const vaultValue ={
+      "data": this.messageToSent,
       "options": {},
       "version": 0
     }
@@ -427,7 +427,7 @@ class Oracle {
       // const vaultValue = this.messageToSent // This is for chubbyhole
       const vaultClient = new VaultClient(vaultUrl)
       await vaultClient.authenticate(vaultToken)
-      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultPathObject)
+      const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
       console.log('vaultWriteResponse:', vaultWriteResponse)
     } catch (error) {
       // Handle errors
@@ -436,7 +436,9 @@ class Oracle {
         error: 'Cannot pass vault validation, please contact system administrator for help'
       })
     }
-
+    const vaultPathObject ={
+      "vaultPath": vaultPath
+    }
     try {
       const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
       const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
