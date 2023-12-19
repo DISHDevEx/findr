@@ -432,11 +432,15 @@ class Oracle {
     await vaultClient.authenticate(vaultToken)
     const vaultWriteResponse = await vaultClient.writeSecret(vaultPath, vaultValue)
     console.log('vaultWriteResponse:', vaultWriteResponse)
+    const vaultPathObject = {
+      'vaultPath': vaultPath
+    }
 
     const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
     const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
       sendOrchestratorRequestUrl,
-      this.messageToSent
+      // this.messageToSent // This can be passed to orchestrator if all params are needed
+      vaultPathObject
     )
     console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse)
 
