@@ -36,4 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_oracle
           push: true
-          tags: pravnreddy429/findr_oracle:v1
+          tags: pravnreddy429/findr_oracle:v2
