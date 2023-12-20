@@ -72,10 +72,10 @@ const mandatoryParameters = [
   dynamodbRegion
 ]
 
-if (mandatoryParameters.some(param => param === '')) {
-  console.error('One or more mandatory parameters are empty strings.')
-  process.exit(1)
-}
+// if (mandatoryParameters.some(param => param === '')) {
+//   console.error('One or more mandatory parameters are empty strings.')
+//   process.exit(1)
+// }
 
 // Your existing logic to start adapters based on parameters
 if (source === '' || destination === '') {
