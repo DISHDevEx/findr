@@ -25,7 +25,7 @@ class Oracle {
    */
   constructor () {
     this.app = express()
-    this.port = parseInt(process.env.API_PORT ?? '8080', 10)
+    this.port = parseInt(process.env.API_PORT ?? '6000', 10)
     this.route = process.env.API_ROUTE ?? '/oracle'
     this.setupMiddleware()
     this.setupRoutes()
