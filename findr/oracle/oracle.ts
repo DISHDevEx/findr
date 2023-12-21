@@ -3,9 +3,9 @@ import cors from 'cors'
 import { v4 as uuidv4 } from 'uuid'
 import axios, { type AxiosResponse } from 'axios'
 import VaultClient from './vault-client.js'
-import dotenv from 'dotenv'
+// import dotenv from 'dotenv'
 
-dotenv.config()
+// dotenv.config()
 
 /**
  * The FindrBackendServer class represents the backend server for the Findr application.
