@@ -12,7 +12,7 @@ class OrchestratorApiClient {
    * @param {object} messageToSent - The message to send in the request.
    * @returns {Promise<any>} A promise representing the orchestrator API response.
    */
-  private sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
+  public sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
     try {
       const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent);
       console.log(response.data);
