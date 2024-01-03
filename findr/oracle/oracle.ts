@@ -51,7 +51,8 @@ class Oracle {
       s3FileKey: '',
       s3Region: '',
       dynamodbTableName: '',
-      dynamodbRegion: ''
+      dynamodbRegion: '',
+      certificate: ''
     }
   }
 
@@ -308,13 +309,15 @@ class Oracle {
       s3FileKey,
       s3Region,
       dynamodbTableName,
-      dynamodbRegion
+      dynamodbRegion,
+      certificate
     } = req.body
 
     console.log('Received request with parameters:', req.body)
 
     this.uuid = uuidv4()
     this.messageToSent.uuid = this.uuid
+    this.messageToSent.certificate = certificate
 
     if (!this.isValidDeviceId(deviceId)) {
       res.status(400).json({ error: 'Invalid deviceId' })
