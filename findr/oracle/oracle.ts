@@ -1,8 +1,8 @@
 import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { v4 as uuidv4 } from 'uuid'
-import axios, { type AxiosResponse } from 'axios'
 import VaultClient from './vault-client.js'
+import OrchestratorApiClient from './orchestrator-client.js'
 // import dotenv from 'dotenv'
 
 // dotenv.config()
@@ -264,30 +264,30 @@ class Oracle {
     return 8883
   }
 
-  /**
-   * Sends a request to the orchestrator API with the provided parameters.
-   * Logs the response or error details.
-   * @param {string} orchestratorUrl - The URL of the orchestrator API.
-   * @param {object} messageToSent - The message to send in the request.
-   * @returns {Promise<any>} A promise representing the orchestrator API response.
-   */
-  private readonly sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
-    try {
-      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
-      console.log(response.data)
-      return response.data
-    } catch (error: any) {
-      console.error('Error sending data:', error.message)
-      if (error.response !== null && error.response !== undefined) {
-        console.error('Response status:', error.response.status)
-        console.error('Response data:', error.response.data)
-      } else if (error.request != null && error.request !== undefined) {
-        console.error('No response received:', error.request)
-      } else {
-        console.error('Error details:', error.message)
-      }
-    }
-  }
+  // /**
+  //  * Sends a request to the orchestrator API with the provided parameters.
+  //  * Logs the response or error details.
+  //  * @param {string} orchestratorUrl - The URL of the orchestrator API.
+  //  * @param {object} messageToSent - The message to send in the request.
+  //  * @returns {Promise<any>} A promise representing the orchestrator API response.
+  //  */
+  // private readonly sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
+  //   try {
+  //     const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
+  //     console.log(response.data)
+  //     return response.data
+  //   } catch (error: any) {
+  //     console.error('Error sending data:', error.message)
+  //     if (error.response !== null && error.response !== undefined) {
+  //       console.error('Response status:', error.response.status)
+  //       console.error('Response data:', error.response.data)
+  //     } else if (error.request != null && error.request !== undefined) {
+  //       console.error('No response received:', error.request)
+  //     } else {
+  //       console.error('Error details:', error.message)
+  //     }
+  //   }
+  // }
 
   /**
    * Handles incoming Findr backend requests. Validates parameters and sends a request to the orchestrator.
@@ -419,7 +419,7 @@ class Oracle {
     // Write path and values to Vault
     const vaultUrl = process.env.VAULT_URL ?? ''
     const vaultToken = process.env.VAULT_TOKEN ?? ''
-    const vaultPath = `${deviceId}-${this.uuid}`
+    const vaultPath = `kv/${deviceId}-${this.uuid}`
     console.log('vaultPath:', vaultPath)
     const vaultValue ={
       "data": this.messageToSent,
@@ -439,12 +439,29 @@ class Oracle {
         error: 'Cannot pass vault validation, please contact system administrator for help'
       })
     }
+
+    const vaultClient = new VaultClient(vaultUrl)
+    await vaultClient.authenticate(vaultToken)
+    const awsCredentials = await vaultClient.readSecret("aws-credentials")
+    console.log('awsCredentials:', awsCredentials)
+    const awsAccessKeyId = awsCredentials.awsAccessKeyId
+    const awsSecretAccessKey = awsCredentials.awsSecretAccessKey
+    const awsSessionToken = awsCredentials.awsSessionToken
+
     const vaultPathObject ={
-      "vaultPath": vaultPath
+      "cluster_config": "kv/iot-findr-edge",
+      "cluster_name": "iot-findr-edge",
+      "connection_info": vaultPath,
+      "namespace": "findr",
+      "container_image": "docker.io/pravnreddy429/findr_adapters:v2",
+      "aws_access_key_id": awsAccessKeyId,
+      "aws_secret_access_key": awsSecretAccessKey,
+      "aws_session_token": awsSessionToken
     }
     try {
       const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
-      const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
+      const orchestratorApiClient = new OrchestratorApiClient()
+      const sendOrchestratorRequestResponse = await orchestratorApiClient.sendOrchestratorRequest(
         sendOrchestratorRequestUrl,
         // this.messageToSent // This can be passed to orchestrator if all params are needed
         vaultPathObject
