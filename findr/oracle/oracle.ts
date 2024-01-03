@@ -444,9 +444,10 @@ class Oracle {
     await vaultClient.authenticate(vaultToken)
     const awsCredentials = await vaultClient.readSecret("aws-credentials")
     console.log('awsCredentials:', awsCredentials)
-    const awsAccessKeyId = awsCredentials.awsAccessKeyId
-    const awsSecretAccessKey = awsCredentials.awsSecretAccessKey
-    const awsSessionToken = awsCredentials.awsSessionToken
+    const awsAccessKeyId = awsCredentials.data.data.awsAccessKeyId
+    const awsSecretAccessKey = awsCredentials.data.data.awsSecretAccessKey
+    const awsSessionToken = awsCredentials.data.data.awsSessionToken
+    console.log('awsAccessKeyId:', awsAccessKeyId)
 
     const vaultPathObject ={
       "cluster_config": "kv/iot-findr-edge",
