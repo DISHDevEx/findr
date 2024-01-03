@@ -419,7 +419,8 @@ class Oracle {
     // Write path and values to Vault
     const vaultUrl = process.env.VAULT_URL ?? ''
     const vaultToken = process.env.VAULT_TOKEN ?? ''
-    const vaultPath = `kv/${deviceId}-${this.uuid}`
+    const vaultPath = `${deviceId}-${this.uuid}`
+    const vaultPathToOrchestrator = `kv/${deviceId}-${this.uuid}`
     console.log('vaultPath:', vaultPath)
     const vaultValue ={
       "data": this.messageToSent,
@@ -452,7 +453,7 @@ class Oracle {
     const vaultPathObject ={
       "cluster_config": "kv/iot-findr-edge",
       "cluster_name": "iot-findr-edge",
-      "connection_info": vaultPath,
+      "connection_info": vaultPathToOrchestrator,
       "namespace": "findr",
       "container_image": "docker.io/pravnreddy429/findr_adapters:v2",
       "aws_access_key_id": awsAccessKeyId,
