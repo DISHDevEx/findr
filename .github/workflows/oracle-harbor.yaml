@@ -3,7 +3,7 @@ name: Docker-Push
 on:
   push:
     branches:
-      - 'main'
+      - 'john/test'
 
 jobs:
   docker:
@@ -39,6 +39,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
 =======
           tags: pravnreddy429/findr_oracle:v2
@@ -49,3 +50,6 @@ jobs:
 =======
           tags: pravnreddy429/findr_oracle:v5
 >>>>>>> 42ec609 (change port to 9000)
+=======
+          tags: pravnreddy429/findr_oracle:v6
+>>>>>>> a7740d3 (add certificate content)
