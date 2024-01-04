@@ -264,31 +264,6 @@ class Oracle {
     return 8883
   }
 
-  // /**
-  //  * Sends a request to the orchestrator API with the provided parameters.
-  //  * Logs the response or error details.
-  //  * @param {string} orchestratorUrl - The URL of the orchestrator API.
-  //  * @param {object} messageToSent - The message to send in the request.
-  //  * @returns {Promise<any>} A promise representing the orchestrator API response.
-  //  */
-  // private readonly sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
-  //   try {
-  //     const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
-  //     console.log(response.data)
-  //     return response.data
-  //   } catch (error: any) {
-  //     console.error('Error sending data:', error.message)
-  //     if (error.response !== null && error.response !== undefined) {
-  //       console.error('Response status:', error.response.status)
-  //       console.error('Response data:', error.response.data)
-  //     } else if (error.request != null && error.request !== undefined) {
-  //       console.error('No response received:', error.request)
-  //     } else {
-  //       console.error('Error details:', error.message)
-  //     }
-  //   }
-  // }
-
   /**
    * Handles incoming Findr backend requests. Validates parameters and sends a request to the orchestrator.
    * Responds with a success message or error details.
