@@ -1,16 +1,13 @@
-import express, { type Request, type Response, type Express } from 'express'
-import bodyParser from 'body-parser'
+import axios from 'axios'
 
 /**
  * HttpAdapter is a class that sets up an HTTP server using Express to receive messages.
  */
 class HttpAdapter {
-  /**
-   * Express instance for handling HTTP requests.
-   * @type {Express}
-   * @private
-   */
-  private readonly http: Express
+  private readonly httpIp: string
+  private readonly httpResponseKey: string
+  private readonly httpRequestInterval: number
+
 
   /**
    * Port number on which the HTTP server will listen.
@@ -41,65 +38,51 @@ class HttpAdapter {
    * @param {(message: object) => void} receiveHttpMessage - Callback function to process received HTTP messages.
    */
   constructor (
+    httpIp: string,
+    httpResponseKey: string,
     httpPortNumber: number,
     httpRoute: string,
+    httpRequestInterval: number,
     receiveHttpMessage: (message: object) => void
   ) {
-    this.http = express()
+    this.httpIp = httpIp
+    this.httpResponseKey = httpResponseKey
+    this.httpRequestInterval = httpRequestInterval
     this.httpPortNumber = httpPortNumber
     this.httpRoute = httpRoute
-    this.setupMiddleware()
-    this.setupRoutes()
+    this.startServer = this.startServer.bind(this)
     this.receiveHttpMessage = receiveHttpMessage
   }
 
   /**
-   * Sets up middleware for the Express instance.
+   * Method to send request.
    * @private
    */
-  private setupMiddleware (): void {
-    this.http.use(bodyParser.json())
-  }
-
-  /**
-   * Sets up routes for handling HTTP POST requests.
-   * @private
-   */
-  private setupRoutes (): void {
-    this.http.post(this.httpRoute, (req: Request, res: Response) => {
-      try {
-        const message = req.body
-        // Process and store the received IoT data
-        console.log('Received IoT message:', message)
-        // Perform necessary actions with the data
-        this.receiveHttpMessage(message)
-        res.send('Message received at server side successfully')
-      } catch (error) {
-        console.error('Error processing IoT message:', error)
-        res.status(500).send('Internal Server Error')
-      }
+  private sendRequest (): void {
+    const httpUrl = `http://${this.httpIp}:${this.httpPortNumber}/${this.httpRoute}`
+    console.log(`HTTP url: ${httpUrl}`)
+    axios.post(httpUrl, {request: 'findr adapter'})
+      .then(response => {
+        const responseFromIoT = response.data[this.httpResponseKey]
+        const responseFromIoTJson = JSON.stringify(responseFromIoT)
+        console.log(`responseFromIoTJson: ${responseFromIoTJson}`)
+        this.receiveHttpMessage(responseFromIoT)
+        console.log('Received HTTP IoT message')
     })
   }
 
   /**
-   * Starts the HTTP server.
+   * Method to start server.
+   * @public
    */
   public startServer (): void {
-    this.http.listen(this.httpPortNumber, () => {
-      console.log(`Server is running on http://localhost:${this.httpPortNumber}`)
-    })
+    console.log('start startServer in http')
+    const intervalId = setInterval(() => {
+      console.log('complete startServer in http')
+      this.sendRequest();
+    }, this.httpRequestInterval);
   }
 
-  // /**
-  //  * Stops the HTTP server.
-  //  */
-  // public async stopHttpServer (): Promise<void> {
-  //   await new Promise<void>((resolve) => {
-  //     this.http.close(() => {
-  //       resolve(undefined)
-  //     })
-  //   })
-  // }
 }
 
 export default HttpAdapter

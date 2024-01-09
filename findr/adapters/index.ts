@@ -11,6 +11,9 @@ dotenv.config()
  * @param {string} localFilePath - The local file path for saving messages.
  * @param {string} mqttsBroker - The MQTT broker address (applicable for 'mqtts' source).
  * @param {string} topic - The MQTT topic to subscribe to (applicable for 'mqtts' source).
+ * @param {string} httpIp
+ * @param {string} httpResponseKey
+ * @param {number} httpRequestInterval
  * @param {string} clientId - The MQTT client ID (applicable for 'mqtts' source).
  * @param {string} caFilePath - The file path of the Certificate Authority file (applicable for 'mqtts' source).
  * @param {number} httpPortNumber - The HTTP server port number (applicable for 'http' source).
@@ -29,8 +32,11 @@ const {
   TOPIC,
   CLIENT_ID,
   CA_FILE_PATH,
+  HTTP_IP,
+  HTTP_RESPONSE_KEY,
   HTTP_PORT_NUMBER,
   HTTP_ROUTE,
+  HTTP_REQUEST_INTERVAL,
   S3_BUCKET_NAME,
   S3_FILE_KEY,
   S3_REGION,
@@ -46,8 +52,11 @@ const mqttsBroker = MQTTS_BROKER ?? ''
 const topic = TOPIC ?? ''
 const clientId = CLIENT_ID ?? ''
 const caFilePath = CA_FILE_PATH ?? ''
+const httpIp = HTTP_IP ?? ''
+const httpResponseKey = HTTP_RESPONSE_KEY ?? ''
 const httpPortNumber = HTTP_PORT_NUMBER ?? ''
 const httpRoute = HTTP_ROUTE ?? ''
+const httpRequestInterval = HTTP_REQUEST_INTERVAL ?? ''
 const s3BucketName = S3_BUCKET_NAME ?? ''
 const s3FileKey = S3_FILE_KEY ?? ''
 const s3Region = S3_REGION ?? ''
@@ -63,8 +72,11 @@ const mandatoryParameters = [
   topic,
   clientId,
   caFilePath,
+  httpIp,
+  httpResponseKey,
   httpPortNumber,
   httpRoute,
+  httpRequestInterval,
   s3BucketName,
   s3FileKey,
   s3Region,
@@ -112,8 +124,11 @@ if (source === 'mqtts') {
   const connectionConfig = {
     destination,
     localFilePath,
+    httpIp,
+    httpResponseKey,
     httpPortNumber: parseInt(httpPortNumber, 10),
     httpRoute,
+    httpRequestInterval: parseInt(httpRequestInterval, 10),
     s3BucketName,
     s3FileKey,
     s3Region,

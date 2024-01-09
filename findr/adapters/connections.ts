@@ -12,8 +12,11 @@ interface AdapterConfig {
   clientId?: string
   caFilePath?: string
   topic?: string
+  httpIp?: string
+  httpResponseKey?: string
   httpPortNumber?: number
   httpRoute?: string
+  httpRequestInterval?: number
   s3BucketName?: string
   s3FileKey?: string
   s3Region?: string
@@ -31,8 +34,11 @@ class Connection {
   private readonly clientId?: string
   private readonly caFilePath?: string
   private readonly topic?: string
+  private readonly httpIp?: string
+  private readonly httpResponseKey?: string
   private readonly httpPortNumber?: number
   private readonly httpRoute?: string
+  private readonly httpRequestInterval?: number
   private readonly s3BucketName?: string
   private readonly s3FileKey?: string
   private readonly s3Region?: string
@@ -54,8 +60,11 @@ class Connection {
     this.clientId = config.clientId
     this.caFilePath = config.caFilePath
     this.topic = config.topic
+    this.httpIp = config.httpIp
+    this.httpResponseKey = config.httpResponseKey
     this.httpPortNumber = config.httpPortNumber
     this.httpRoute = config.httpRoute
+    this.httpRequestInterval = config.httpRequestInterval
     this.s3BucketName = config.s3BucketName
     this.s3FileKey = config.s3FileKey
     this.s3Region = config.s3Region
@@ -148,7 +157,10 @@ class Connection {
   public startHttp (): void {
     const httpPortNumber = this.httpPortNumber ?? 3000
     const httpRoute = this.httpRoute ?? ''
-    const httpAdapter = new HttpAdapter(httpPortNumber, httpRoute, this.receiveHttpMessage.bind(this))
+    const httpIp = this.httpIp ?? ''
+    const httpResponseKey = this.httpResponseKey ?? ''
+    const httpRequestInterval = this.httpRequestInterval ?? 1000
+    const httpAdapter = new HttpAdapter(httpIp, httpResponseKey, httpPortNumber, httpRoute, httpRequestInterval, this.receiveHttpMessage.bind(this))
     console.log('Attempting to start HttpAdapter in Connection.ts')
     httpAdapter.startServer()
     console.log('HttpAdapter started successfully in Connection.ts')
