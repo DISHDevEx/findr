@@ -14,7 +14,13 @@ class OrchestratorApiClient {
    */
   public sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
     try {
-      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent);
+      const response: AxiosResponse = await axios.post(`${orchestratorUrl}:5000/deploy`, messageToSent, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Connection': 'keep-alive',
+        },
+      })
       console.log(response.data);
       return response.data;
     } catch (error: any) {
