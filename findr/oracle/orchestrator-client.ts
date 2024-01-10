@@ -14,6 +14,8 @@ class OrchestratorApiClient {
    */
   public sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
     try {
+      console.log('orchestratorUrl',orchestratorUrl)
+      console.log('messageToSent', messageToSent)
       const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
       console.log(response.data)
       return response.data
