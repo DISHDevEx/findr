@@ -11,9 +11,9 @@ dotenv.config()
  * @param {string} localFilePath - The local file path for saving messages.
  * @param {string} mqttsBroker - The MQTT broker address (applicable for 'mqtts' source).
  * @param {string} topic - The MQTT topic to subscribe to (applicable for 'mqtts' source).
- * @param {string} httpIp
- * @param {string} httpResponseKey
- * @param {number} httpRequestInterval
+ * @param {string} httpIp - The HTTP IP to send rquest
+ * @param {string} httpResponseKey - The HTTP response key within body
+ * @param {number} httpRequestInterval - The HTTP request interval by milliseconds
  * @param {string} clientId - The MQTT client ID (applicable for 'mqtts' source).
  * @param {string} caFilePath - The file path of the Certificate Authority file (applicable for 'mqtts' source).
  * @param {number} httpPortNumber - The HTTP server port number (applicable for 'http' source).
@@ -62,32 +62,6 @@ const s3FileKey = S3_FILE_KEY ?? ''
 const s3Region = S3_REGION ?? ''
 const dynamodbTableName = DYNAMODB_TABLE_NAME ?? ''
 const dynamodbRegion = DYNAMODB_REGION ?? ''
-
-// Check if any of the mandatory parameters are empty strings
-const mandatoryParameters = [
-  source,
-  destination,
-  localFilePath,
-  mqttsBroker,
-  topic,
-  clientId,
-  caFilePath,
-  httpIp,
-  httpResponseKey,
-  httpPortNumber,
-  httpRoute,
-  httpRequestInterval,
-  s3BucketName,
-  s3FileKey,
-  s3Region,
-  dynamodbTableName,
-  dynamodbRegion
-]
-
-// if (mandatoryParameters.some(param => param === '')) {
-//   console.error('One or more mandatory parameters are empty strings.')
-//   process.exit(1)
-// }
 
 // Your existing logic to start adapters based on parameters
 if (source === '' || destination === '') {

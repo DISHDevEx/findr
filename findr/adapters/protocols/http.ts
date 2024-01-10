@@ -2,39 +2,59 @@ import axios from 'axios'
 
 /**
  * HttpAdapter is a class that sets up an HTTP server using Express to receive messages.
+ * @class
  */
 class HttpAdapter {
+  /**
+   * IP address of the HTTP server.
+   * @private
+   * @type {string}
+   */
   private readonly httpIp: string
-  private readonly httpResponseKey: string
-  private readonly httpRequestInterval: number
 
+  /**
+   * Key to extract the HTTP response from the server's response data.
+   * @private
+   * @type {string}
+   */
+  private readonly httpResponseKey: string
+
+  /**
+   * Interval (in milliseconds) at which HTTP requests are sent.
+   * @private
+   * @type {number}
+   */
+  private readonly httpRequestInterval: number
 
   /**
    * Port number on which the HTTP server will listen.
-   * @type {number}
    * @private
+   * @type {number}
    */
   private readonly httpPortNumber: number
 
   /**
    * Route for receiving HTTP messages.
-   * @type {string}
    * @private
+   * @type {string}
    */
   private readonly httpRoute: string
 
   /**
    * Callback function to process received HTTP messages.
-   * @type {(message: object) => void}
    * @private
+   * @type {(message: object) => void}
    */
   private readonly receiveHttpMessage: (message: object) => void
 
   /**
    * Constructs an HttpAdapter instance.
    *
-   * @param {number} httpPortNumber - The port number on which the HTTP server will listen.
-   * @param {string} httpRoute - The route for receiving HTTP messages.
+   * @param {string} httpIp - IP address of the HTTP server.
+   * @param {string} httpResponseKey - Key to extract the HTTP response from the server's response data.
+   * @param {number} httpPortNumber - Port number on which the HTTP server will listen.
+   * @param {string} httpRoute - Route for receiving HTTP messages.
+   * @param {number} httpRequestInterval - Interval (in milliseconds) at which HTTP requests are sent.
    * @param {(message: object) => void} receiveHttpMessage - Callback function to process received HTTP messages.
    */
   constructor (
@@ -50,39 +70,42 @@ class HttpAdapter {
     this.httpRequestInterval = httpRequestInterval
     this.httpPortNumber = httpPortNumber
     this.httpRoute = httpRoute
-    this.startServer = this.startServer.bind(this)
     this.receiveHttpMessage = receiveHttpMessage
   }
 
   /**
-   * Method to send request.
+   * Method to send an HTTP request.
    * @private
    */
   private sendRequest (): void {
     const httpUrl = `http://${this.httpIp}:${this.httpPortNumber}/${this.httpRoute}`
     console.log(`HTTP url: ${httpUrl}`)
-    axios.post(httpUrl, {request: 'findr adapter'})
+
+    axios.post(httpUrl, { request: 'findr adapter' })
       .then(response => {
         const responseFromIoT = response.data[this.httpResponseKey]
         const responseFromIoTJson = JSON.stringify(responseFromIoT)
         console.log(`responseFromIoTJson: ${responseFromIoTJson}`)
         this.receiveHttpMessage(responseFromIoT)
         console.log('Received HTTP IoT message')
-    })
+      })
+      .catch(error => {
+        // Handle error if needed
+        console.error('Error sending HTTP request:', error)
+      })
   }
 
   /**
-   * Method to start server.
+   * Method to start the HTTP server and initiate periodic HTTP requests.
    * @public
    */
   public startServer (): void {
-    console.log('start startServer in http')
-    const intervalId = setInterval(() => {
-      console.log('complete startServer in http')
-      this.sendRequest();
-    }, this.httpRequestInterval);
+    console.log('Starting HTTP server')
+    setInterval(() => {
+      console.log('Sending HTTP request')
+      this.sendRequest()
+    }, this.httpRequestInterval)
   }
-
 }
 
 export default HttpAdapter

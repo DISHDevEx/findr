@@ -3,7 +3,7 @@ name: Docker-Push
 on:
   push:
     branches:
-      - 'main'
+      - 'john/oracle-or'
 
 jobs:
   docker:
@@ -41,6 +41,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
 =======
           tags: pravnreddy429/findr_oracle:v2
@@ -57,3 +58,6 @@ jobs:
 =======
           tags: pravnreddy429/findr_oracle:v8
 >>>>>>> 7711941 (add orchestrator-client, add aws credentials)
+=======
+          tags: pravnreddy429/findr_oracle:v14
+>>>>>>> e1b4652 (v3 adapter v14 oracle)
