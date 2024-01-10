@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from 'axios'
 
 /**
  * OrchestratorApiClient is a class for interacting with the orchestrator API.
@@ -14,27 +14,21 @@ class OrchestratorApiClient {
    */
   public sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
     try {
-      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-        },
-      })
-      console.log(response.data);
-      return response.data;
+      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
+      console.log(response.data)
+      return response.data
     } catch (error: any) {
-      console.error('Error sending data:', error.message);
+      console.error('Error sending data:', error.message)
       if (error.response !== null && error.response !== undefined) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status)
+        console.error('Response data:', error.response.data)
       } else if (error.request != null && error.request !== undefined) {
-        console.error('No response received:', error.request);
+        console.error('No response received:', error.request)
       } else {
-        console.error('Error details:', error.message);
+        console.error('Error details:', error.message)
       }
     }
-  };
+  }
 }
 
 export default OrchestratorApiClient
