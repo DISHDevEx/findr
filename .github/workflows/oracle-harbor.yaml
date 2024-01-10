@@ -42,6 +42,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
 =======
           tags: pravnreddy429/findr_oracle:v2
@@ -61,3 +62,6 @@ jobs:
 =======
           tags: pravnreddy429/findr_oracle:v14
 >>>>>>> e1b4652 (v3 adapter v14 oracle)
+=======
+          tags: pravnreddy429/findr_oracle:v16
+>>>>>>> 9c40817 (v16 oracle add new http parameters)
