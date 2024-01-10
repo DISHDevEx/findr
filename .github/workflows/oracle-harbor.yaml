@@ -43,6 +43,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
 =======
           tags: pravnreddy429/findr_oracle:v2
@@ -65,3 +66,6 @@ jobs:
 =======
           tags: pravnreddy429/findr_oracle:v16
 >>>>>>> 9c40817 (v16 oracle add new http parameters)
+=======
+          tags: pravnreddy429/findr_oracle:v17
+>>>>>>> f6636f9 (update http path in oracle)
