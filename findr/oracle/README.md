@@ -12,6 +12,8 @@ findr/
 │   ├── vault-client.ts
 │   │
 │   ├── harbor-client.ts    
+│   │
+│   ├── orchestrator-client.ts   
 │    
 
 ```
@@ -26,7 +28,15 @@ findr/
 
 ## Usage
 
-To harness the power of oracle.ts, simply make API requests from the FINDR UI. oracle.ts will work its magic, validating the Vault, facilitating connections, and delivering responses promptly.
+To harness the power of oracle.ts, simply make API requests from the FINDR UI. oracle.ts will work its magic, validating the Vault, facilitating connections via orchestrator-client.ts, and delivering responses promptly.
+
+## Functionalities Flow
+
+1. Receive device info from UI
+2. Validate device info
+3. Register device info in Vault
+4. Pass all info to Orchestrator
+5. Send response back to UI
 
 ## Installation
 
