@@ -44,6 +44,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
 =======
           tags: pravnreddy429/findr_oracle:v2
@@ -69,3 +70,6 @@ jobs:
 =======
           tags: pravnreddy429/findr_oracle:v17
 >>>>>>> f6636f9 (update http path in oracle)
+=======
+          tags: pravnreddy429/findr_oracle:v24
+>>>>>>> 40de4da (oracle v24, update adapter image version)
