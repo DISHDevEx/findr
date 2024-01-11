@@ -80,7 +80,7 @@ class Oracle {
    * Sets up CORS and JSON body parsing middleware for the Express application.
    */
   private setupMiddleware (): void {
-    // this.app.use(cors())
+    this.app.use(cors())
     this.app.use(express.json())
   }
 
