@@ -36,4 +36,8 @@ jobs:
           context: .
           file: ./Dockerfile_oracle
           push: true
+<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
+=======
+          tags: pravnreddy429/findr_oracle:v24
+>>>>>>> 40de4da (oracle v24, update adapter image version)
