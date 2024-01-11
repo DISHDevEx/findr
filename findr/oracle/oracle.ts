@@ -310,7 +310,39 @@ class Oracle {
    * @param {Response} res - The Express response object.
    */
   private readonly handleFindrBackendRequest = async (req: Request, res: Response): Promise<void> => {
+    function assignDefaultIfEmpty (value: string | undefined | null, defaultValue: string): string {
+      // Check if the value is empty, undefined, or null
+      if (value === '' || value === undefined || value === null) {
+        return defaultValue
+      }
+      // If not empty, return the original value
+      return value
+    }
+
     const {
+      deviceId = assignDefaultIfEmpty(req.body.deviceId, 'null_from_customer'),
+      source = assignDefaultIfEmpty(req.body.source, 'null_from_customer'),
+      destination = assignDefaultIfEmpty(req.body.destination, 'null_from_customer'),
+      mqttsBroker = assignDefaultIfEmpty(req.body.mqttsBroker, 'null_from_customer'),
+      topic = assignDefaultIfEmpty(req.body.topic, 'null_from_customer'),
+      clientId = assignDefaultIfEmpty(req.body.clientId, 'null_from_customer'),
+      httpIp = assignDefaultIfEmpty(req.body.httpIp, 'null_from_customer'),
+      httpResponseKey = assignDefaultIfEmpty(req.body.httpResponseKey, 'null_from_customer'),
+      httpPortNumber = assignDefaultIfEmpty(req.body.httpPortNumber, 'null_from_customer'),
+      httpRoute = assignDefaultIfEmpty(req.body.httpRoute, 'null_from_customer'),
+      httpRequestInterval = assignDefaultIfEmpty(req.body.httpRequestInterval, 'null_from_customer'),
+      s3BucketName = assignDefaultIfEmpty(req.body.s3BucketName, 'null_from_customer'),
+      s3FileKey = assignDefaultIfEmpty(req.body.s3FileKey, 'null_from_customer'),
+      s3Region = assignDefaultIfEmpty(req.body.s3Region, 'null_from_customer'),
+      dynamodbTableName = assignDefaultIfEmpty(req.body.dynamodbTableName, 'null_from_customer'),
+      dynamodbRegion = assignDefaultIfEmpty(req.body.dynamodbRegion, 'null_from_customer'),
+      certificate = assignDefaultIfEmpty(req.body.certificate, 'null_from_customer')
+    } = req.body
+
+    console.log('Received request with parameters:', req.body)
+
+    // Log the updated values
+    console.log('Updated parameters:', {
       deviceId,
       source,
       destination,
@@ -328,9 +360,7 @@ class Oracle {
       dynamodbTableName,
       dynamodbRegion,
       certificate
-    } = req.body
-
-    console.log('Received request with parameters:', req.body)
+    })
 
     this.uuid = uuidv4()
     this.messageToSent.uuid = this.uuid
