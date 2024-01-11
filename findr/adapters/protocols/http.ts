@@ -43,9 +43,9 @@ class HttpAdapter {
   /**
    * Callback function to process received HTTP messages.
    * @private
-   * @type {(message: object) => void}
+   * @type {(message: object) => Promise<void>}
    */
-  private readonly receiveHttpMessage: (message: object) => void
+  private readonly receiveHttpMessage: (message: object) => Promise<void>
 
   /**
    * Constructs an HttpAdapter instance.
@@ -55,7 +55,7 @@ class HttpAdapter {
    * @param {number} httpPortNumber - Port number on which the HTTP server will listen.
    * @param {string} httpRoute - Route for receiving HTTP messages.
    * @param {number} httpRequestInterval - Interval (in milliseconds) at which HTTP requests are sent.
-   * @param {(message: object) => void} receiveHttpMessage - Callback function to process received HTTP messages.
+   * @param {(message: object) => Promise<void>} receiveHttpMessage - Callback function to process received HTTP messages.
    */
   constructor (
     httpIp: string,
@@ -63,7 +63,7 @@ class HttpAdapter {
     httpPortNumber: number,
     httpRoute: string,
     httpRequestInterval: number,
-    receiveHttpMessage: (message: object) => void
+    receiveHttpMessage: (message: object) => Promise<void>
   ) {
     this.httpIp = httpIp
     this.httpResponseKey = httpResponseKey
@@ -77,22 +77,25 @@ class HttpAdapter {
    * Method to send an HTTP request.
    * @private
    */
-  private sendRequest (): void {
+  private async sendRequest (): Promise<void> {
     const httpUrl = `http://${this.httpIp}:${this.httpPortNumber}/${this.httpRoute}`
     console.log(`HTTP url: ${httpUrl}`)
 
-    axios.post(httpUrl, { request: 'findr adapter' })
-      .then(response => {
-        const responseFromIoT = response.data[this.httpResponseKey]
-        const responseFromIoTJson = JSON.stringify(responseFromIoT)
-        console.log(`responseFromIoTJson: ${responseFromIoTJson}`)
-        this.receiveHttpMessage(responseFromIoT)
-        console.log('Received HTTP IoT message')
+    try {
+      const response = await axios.post(httpUrl, { request: 'findr adapter' })
+      const responseFromIoT = await response.data[this.httpResponseKey]
+      const responseFromIoTJson = JSON.stringify(responseFromIoT)
+      console.log(`responseFromIoTJson: ${responseFromIoTJson}`)
+
+      await this.receiveHttpMessage(responseFromIoT).catch(error => {
+        console.error('Error handling HTTP message:', error)
       })
-      .catch(error => {
-        // Handle error if needed
-        console.error('Error sending HTTP request:', error)
-      })
+
+      console.log('Received HTTP IoT message')
+    } catch (error) {
+      // Handle error if needed
+      console.error('Error sending HTTP request:', error)
+    }
   }
 
   /**
@@ -103,7 +106,9 @@ class HttpAdapter {
     console.log('Starting HTTP server')
     setInterval(() => {
       console.log('Sending HTTP request')
-      this.sendRequest()
+      this.sendRequest().catch(error => {
+        console.error('Error sending or handling HTTP request:', error)
+      })
     }, this.httpRequestInterval)
   }
 }
