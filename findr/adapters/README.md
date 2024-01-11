@@ -53,7 +53,7 @@ findr/
 - `s3.ts`: Module for connecting AWS S3.
 - `dynamodb.ts`: Module for connecting AWS DynamoDB.
 
-### Processors.
+### Processors
 
 - `processors.ts`: File containing data processors.
 
