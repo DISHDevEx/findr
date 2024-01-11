@@ -18,7 +18,7 @@ class OrchestratorApiClient {
       console.log('messageToSent', messageToSent)
       const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
       console.log(response.data)
-      return response.data
+      return response
     } catch (error: any) {
       console.error('Error sending data:', error.message)
       if (error.response !== null && error.response !== undefined) {
