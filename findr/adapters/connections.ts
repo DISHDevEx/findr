@@ -201,12 +201,12 @@ class Connection {
         console.log(`Type: ${typeof this.dynamodbRegion}, Value: ${this.dynamodbRegion}`)
 
         if (this.destination === 's3' && this.s3BucketName !== undefined && this.s3FileKey !== undefined && this.s3Region !== undefined) {
-          console.log('Upload to s3 from mqtts')
+          console.log('Upload to s3 from http')
           const newS3FileKey = this.processors.constructFileName(this.s3FileKey, this.currentDate)
           await this.processors.fromIotToS3(oldFileName, this.s3BucketName, newS3FileKey, this.s3Region).catch(() => {})
         }
         if (this.destination === 'dynamodb' && this.dynamodbTableName !== undefined && this.dynamodbRegion !== undefined) {
-          console.log('Upload to dynamodb from mqtts')
+          console.log('Upload to dynamodb from http')
           await this.processors.fromIotToDynamoDB(oldFileName, this.dynamodbTableName, this.dynamodbRegion).catch(() => {})
         }
 
