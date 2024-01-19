@@ -64,11 +64,9 @@ export class DynamoDBUploader {
           TableName: this.tableName,
           Item: {
             companyName: { S: data.companyName },
-            departmentName: { S: data.departmentName },
+            deviceMessage: { S: data.deviceMessage },
             timePublished: { S: data.timePublished },
-            deviceId: { N: data.deviceId.toString() } // Use N for numeric attributes
-            // Add other attributes as needed for your composite key
-            // attributeName: { S: data.attributeName },
+            deviceId: { S: data.deviceId }
           }
         }
 
