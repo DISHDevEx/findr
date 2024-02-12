@@ -66,7 +66,7 @@ class VaultClient {
       headers: { 'X-Vault-Token': this.token, accept: '*/*' }
     })
 
-    return response.data.data
+    return response.data
   }
 
   /**
@@ -88,8 +88,6 @@ class VaultClient {
 
     return response.status
   }
-<<<<<<< HEAD
-=======
 
   /**
    * Deletes secrets from a specified path.
@@ -110,7 +108,6 @@ class VaultClient {
 
     return response.data
   }
->>>>>>> c66fac5 (oracle passes eslint)
 }
 
 export default VaultClient
