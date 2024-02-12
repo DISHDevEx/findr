@@ -1,10 +1,6 @@
 import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { v4 as uuidv4 } from 'uuid'
-<<<<<<< HEAD
-=======
-import axios, { type AxiosResponse } from 'axios'
->>>>>>> c66fac5 (oracle passes eslint)
 import VaultClient from './vault-client.js'
 import OrchestratorApiClient from './orchestrator-client.js'
 // import dotenv from 'dotenv'
@@ -29,11 +25,7 @@ class Oracle {
    */
   constructor () {
     this.app = express()
-<<<<<<< HEAD
     this.port = parseInt(process.env.API_PORT ?? '9000', 10)
-=======
-    this.port = parseInt(process.env.API_PORT ?? '8080', 10)
->>>>>>> c66fac5 (oracle passes eslint)
     this.route = process.env.API_ROUTE ?? '/oracle'
     this.setupMiddleware()
     this.setupRoutes()
@@ -53,26 +45,17 @@ class Oracle {
       mqttsBroker: '',
       topic: '',
       clientId: '',
-<<<<<<< HEAD
       httpIp: '',
       httpResponseKey: '',
       httpPortNumber: '',
       httpRoute: '',
       httpRequestInterval: '',
-=======
-      httpPortNumber: '',
-      httpRoute: '',
->>>>>>> c66fac5 (oracle passes eslint)
       s3BucketName: '',
       s3FileKey: '',
       s3Region: '',
       dynamodbTableName: '',
-<<<<<<< HEAD
       dynamodbRegion: '',
       certificate: ''
-=======
-      dynamodbRegion: ''
->>>>>>> c66fac5 (oracle passes eslint)
     }
   }
 
@@ -149,7 +132,6 @@ class Oracle {
    */
   private isValidClientId (clientId: string): boolean {
     return typeof clientId === 'string' && clientId.trim().length > 0
-<<<<<<< HEAD
   }
 
   /**
@@ -169,8 +151,6 @@ class Oracle {
    */
   private isValidHttpResponseKey (httpResponseKey: string): boolean {
     return typeof httpResponseKey === 'string' && httpResponseKey.trim().length > 0
-=======
->>>>>>> c66fac5 (oracle passes eslint)
   }
 
   /**
@@ -189,7 +169,6 @@ class Oracle {
    * @returns {boolean} True if the httpRoute is a valid HTTP route, false otherwise.
    */
   private isValidHttpRoute (httpRoute: string): boolean {
-<<<<<<< HEAD
     const pattern = /^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+$/
     return pattern.test(httpRoute)
   }
@@ -203,10 +182,6 @@ class Oracle {
     // Use the unary plus operator to convert the string to a number and check if it's a valid number
     const numericValue = +httpRequestInterval
     return !isNaN(numericValue) && numericValue > 0
-=======
-    const pattern = /^\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+$/
-    return pattern.test(httpRoute)
->>>>>>> c66fac5 (oracle passes eslint)
   }
 
   /**
@@ -323,44 +298,6 @@ class Oracle {
   }
 
   /**
-<<<<<<< HEAD
-=======
-   * Sends a request to the orchestrator API with the provided parameters.
-   * Logs the response or error details.
-   * @param {string} orchestratorUrl - The URL of the orchestrator API.
-   * @param {object} messageToSent - The message to send in the request.
-   * @returns {Promise<any>} A promise representing the orchestrator API response.
-   */
-  private readonly sendOrchestratorRequest = async (orchestratorUrl: string, messageToSent: object): Promise<any> => {
-    try {
-      const response: AxiosResponse = await axios.post(orchestratorUrl, messageToSent)
-      console.log(response.data)
-      return response.data
-    } catch (error: any) {
-      console.error('Error sending data:', error.message)
-      if (error.response !== null && error.response !== undefined) {
-        console.error('Response status:', error.response.status)
-        console.error('Response data:', error.response.data)
-      } else if (error.request != null && error.request !== undefined) {
-        console.error('No response received:', error.request)
-      } else {
-        console.error('Error details:', error.message)
-      }
-    }
-  }
-
-  // /**
-  //  * Validates a parameter for use in the vault.
-  //  * @param {string} param1 - The parameter to validate.
-  //  * @returns {boolean} True if the parameter is valid for the vault, false otherwise.
-  //  */
-  // private vaultValidation = (vaultPath: string, vaultValue: string): any => {
-  //   // add logic here
-  //   return true
-  // }
-
-  /**
->>>>>>> c66fac5 (oracle passes eslint)
    * Handles incoming Findr backend requests. Validates parameters and sends a request to the orchestrator.
    * Responds with a success message or error details.
    * @param {Request} req - The Express request object.
@@ -383,48 +320,30 @@ class Oracle {
       s3FileKey,
       s3Region,
       dynamodbTableName,
-<<<<<<< HEAD
       dynamodbRegion,
       certificate
-=======
-      dynamodbRegion
->>>>>>> c66fac5 (oracle passes eslint)
     } = req.body
 
     console.log('Received request with parameters:', req.body)
 
     this.uuid = uuidv4()
     this.messageToSent.uuid = this.uuid
-<<<<<<< HEAD
     this.messageToSent.certificate = certificate
 
     if (!this.isValidDeviceId(deviceId)) {
       res.status(400).send('Invalid deviceId')
-=======
-
-    if (!this.isValidDeviceId(deviceId)) {
-      res.status(400).json({ error: 'Invalid deviceId' })
->>>>>>> c66fac5 (oracle passes eslint)
       return
     }
     this.messageToSent.deviceId = deviceId
 
     if (!this.isValidSource(source) || !this.isValidDestination(destination)) {
-<<<<<<< HEAD
       res.status(400).send('Invalid source or destination')
-=======
-      res.status(400).json({ error: 'Invalid source or destination' })
->>>>>>> c66fac5 (oracle passes eslint)
       return
     }
 
     // Validate other parameters
     if (!this.isValidSource(source) || !this.isValidDestination(destination)) {
-<<<<<<< HEAD
       res.status(400).send('Invalid source or destination')
-=======
-      res.status(400).json({ error: 'Invalid source or destination' })
->>>>>>> c66fac5 (oracle passes eslint)
       return
     }
     let message = `Data received successfully! DeviceId: ${deviceId}, Source: ${source}, Destination: ${destination}, UUID: ${this.uuid},`
@@ -435,11 +354,7 @@ class Oracle {
       if (!this.isValidMqttsBroker(mqttsBroker) ||
             !this.isValidTopic(topic) ||
             !this.isValidClientId(clientId)) {
-<<<<<<< HEAD
         res.status(400).send('Invalid mqtts parameters')
-=======
-        res.status(400).json({ error: 'Invalid mqtts parameters' })
->>>>>>> c66fac5 (oracle passes eslint)
         return
       } else {
         this.containerPort = this.extractMqttsPort(mqttsBroker)
@@ -455,7 +370,6 @@ class Oracle {
     } else if (source === 'http') {
       // Validate http-specific parameters
       if (!this.isValidHttpPortNumber(httpPortNumber) ||
-<<<<<<< HEAD
             !this.isValidHttpRoute(httpRoute) ||
             !this.isValidHttpIp(httpIp) ||
             !this.isValidHttpResponseKey(httpResponseKey) ||
@@ -470,27 +384,11 @@ class Oracle {
         this.messageToSent.httpPortNumber = httpPortNumber
         this.messageToSent.httpRoute = httpRoute
         this.messageToSent.httpRequestInterval = httpRequestInterval
-=======
-            !this.isValidHttpRoute(httpRoute)) {
-        res.status(400).json({ error: 'Invalid http parameters' })
-        return
-      } else {
-        this.containerPort = parseInt(httpPortNumber, 10)
-        // will get target_http from edge cluster in the response of orchestrator api
-        const targetHttp = '165.225.216.231'
-        this.messageToSent.source = source
-        this.messageToSent.httpPortNumber = httpPortNumber
-        this.messageToSent.httpRoute = httpRoute
->>>>>>> c66fac5 (oracle passes eslint)
         this.messageToSent.containerPort = this.containerPort
         this.messageToSent.mqttsBroker = ''
         this.messageToSent.topic = ''
         this.messageToSent.clientId = ''
-<<<<<<< HEAD
         message += ` HttpIp: ${httpIp}, HttpResponseKey: ${httpResponseKey}, HttpPortNumber: ${httpPortNumber}, HttpRoute: ${httpRoute}, HttpRequestInterval: ${httpRequestInterval}, ContainerPort: ${this.containerPort},`
-=======
-        message += ` HttpPortNumber: ${httpPortNumber}, HttpRoute: ${httpRoute}, ContainerPort: ${this.containerPort}, Target_http: ${targetHttp},`
->>>>>>> c66fac5 (oracle passes eslint)
       }
     }
 
@@ -499,11 +397,7 @@ class Oracle {
       if (!this.isValidS3BucketName(s3BucketName) ||
             !this.isValidS3FileKey(s3FileKey) ||
             !this.isValidS3Region(s3Region)) {
-<<<<<<< HEAD
         res.status(400).send('Invalid s3 parameters')
-=======
-        res.status(400).json({ error: 'Invalid s3 parameters' })
->>>>>>> c66fac5 (oracle passes eslint)
         return
       } else {
         this.messageToSent.destination = destination
@@ -518,11 +412,7 @@ class Oracle {
       // Validate dynamodb-specific parameters
       if (!this.isValidDynamoDBTableName(dynamodbTableName) ||
             !this.isValidDynamoDBRegion(dynamodbRegion)) {
-<<<<<<< HEAD
         res.status(400).send('Invalid dynamodb parameters')
-=======
-        res.status(400).json({ error: 'Invalid dynamodb parameters' })
->>>>>>> c66fac5 (oracle passes eslint)
         return
       } else {
         this.messageToSent.destination = destination
@@ -539,23 +429,13 @@ class Oracle {
     const caFilePath = '/app/certs/ca.crt'
     this.messageToSent.localFilePath = localFilePath
     this.messageToSent.caFilePath = caFilePath
-<<<<<<< HEAD
     console.log('UI parameter validation finished.')
-=======
->>>>>>> c66fac5 (oracle passes eslint)
 
     // Write path and values to Vault
     const vaultUrl = process.env.VAULT_URL ?? ''
     const vaultToken = process.env.VAULT_TOKEN ?? ''
     const vaultPath = `${deviceId}-${this.uuid}`
-<<<<<<< HEAD
     const vaultPathToOrchestrator = `kv/${deviceId}-${this.uuid}`
-=======
-    const vaultValue = this.messageToSent
-    const vaultClient = new VaultClient(vaultUrl)
-    await vaultClient.authenticate(vaultToken)
-    await vaultClient.writeSecret(vaultPath, vaultValue)
->>>>>>> c66fac5 (oracle passes eslint)
     console.log('vaultPath:', vaultPath)
     const vaultValue = {
       data: this.messageToSent,
@@ -576,7 +456,6 @@ class Oracle {
       )
     }
 
-<<<<<<< HEAD
     const vaultClient = new VaultClient(vaultUrl)
     await vaultClient.authenticate(vaultToken)
     const awsCredentials = await vaultClient.readSecret('aws-credentials')
@@ -615,19 +494,6 @@ class Oracle {
       res.status(500).send('Cannot get response from orchestrator, please contact system administrator for help'
       )
     }
-=======
-    const sendOrchestratorRequestUrl = process.env.FINDR_ORCHESTRATOR_URL ?? ''
-    const sendOrchestratorRequestResponse = await this.sendOrchestratorRequest(
-      sendOrchestratorRequestUrl,
-      this.messageToSent
-    )
-    console.log('sendOrchestratorRequestResponse:', sendOrchestratorRequestResponse)
-
-    message += ' are received parameters'
-    res.status(200).json({
-      message
-    })
->>>>>>> c66fac5 (oracle passes eslint)
   }
 
   /**

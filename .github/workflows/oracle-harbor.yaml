@@ -36,40 +36,4 @@ jobs:
           context: .
           file: ./Dockerfile_oracle
           push: true
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
           tags: pravnreddy429/findr_oracle:v33
-=======
-          tags: pravnreddy429/findr_oracle:v2
->>>>>>> 7332422 (oracle v2)
-=======
-          tags: pravnreddy429/findr_oracle:v4
->>>>>>> 60182f5 (pass env from kubernetes to oracle)
-=======
-          tags: pravnreddy429/findr_oracle:v5
->>>>>>> 42ec609 (change port to 9000)
-=======
-          tags: pravnreddy429/findr_oracle:v6
->>>>>>> a7740d3 (add certificate content)
-=======
-          tags: pravnreddy429/findr_oracle:v8
->>>>>>> 7711941 (add orchestrator-client, add aws credentials)
-=======
-          tags: pravnreddy429/findr_oracle:v14
->>>>>>> e1b4652 (v3 adapter v14 oracle)
-=======
-          tags: pravnreddy429/findr_oracle:v16
->>>>>>> 9c40817 (v16 oracle add new http parameters)
-=======
-          tags: pravnreddy429/findr_oracle:v17
->>>>>>> f6636f9 (update http path in oracle)
-=======
-          tags: pravnreddy429/findr_oracle:v24
->>>>>>> 40de4da (oracle v24, update adapter image version)
