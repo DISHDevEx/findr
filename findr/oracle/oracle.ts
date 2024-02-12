@@ -505,9 +505,7 @@ class Oracle {
     })
   }
 }
-
 // Create an instance of the FindrBackendServer class
 const oracle = new Oracle()
-
 // Start the server
 oracle.startServer()
